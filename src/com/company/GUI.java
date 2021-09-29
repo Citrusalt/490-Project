@@ -53,13 +53,15 @@ public class GUI{
 
         //This is temporarily hardcoded, this will need to be dynamically assigned at runtime in the future
         Object[][] data = {
-                {"Process A", 10},
-                {"Process B", 14},
-                {"Process C", 4}
+                //{column 1, column 2}
+                {"Process A", 10}, //row 1
+                {"Process B", 14}, //row 2
+                {"Process C", 4} //row 3
+                //{"Process X, X} //row X
         };
         processQueueTable.setModel(new DefaultTableModel(
                 data,
-                new String[]{"Process Name", "Service Time"}
+                new String[]{"Process Name", "Service Time"} //number of entered strings is number of columns
         ));
     }
 
