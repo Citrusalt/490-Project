@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Phase 1 GUI Rough:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Phase_1_GUI_Rough_jar</output-path>
+    <root id="archive" name="Phase 1 GUI Rough.jar">
+      <element id="module-output" name="Phase 1 GUI Rough" />
+    </root>
+  </artifact>
+</component>

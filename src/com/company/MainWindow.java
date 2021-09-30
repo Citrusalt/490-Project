@@ -2,11 +2,10 @@ package com.company;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class GUI{
+public class MainWindow {
 
     private JButton startSystemButton;
     private JButton pauseSystemButton;
@@ -21,7 +20,8 @@ public class GUI{
     private JLabel execStatus;
     private JLabel timeLabel;
 
-    public GUI(String title) {
+    public MainWindow() {
+
 
         //Initialize table contents here
         createTable();
@@ -65,14 +65,13 @@ public class GUI{
         ));
     }
 
-    public static void main(String[] args){
 
+    //Constructor
+    public void createGUI(){
         JFrame frame = new JFrame("Phase 1 GUI");
-        frame.setContentPane(new GUI("Phase 1 GUI").mainPanel);
+        frame.setContentPane(new MainWindow().mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-
-
     }
 }
