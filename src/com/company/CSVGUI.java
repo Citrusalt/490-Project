@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
+//obsolete
 
 public class CSVGUI{
     private JTextField textField1;
@@ -14,15 +14,12 @@ public class CSVGUI{
     JFrame frame = new JFrame("Phase 1 CSV GUI");
     CSVReader myCSVReader = new CSVReader();
 
-    //GUI Creation
-    MainWindow myGUI = new MainWindow();
-
 
     public CSVGUI() {
         textField1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                myCSVReader.createArray(textField1.getText()); //calls CSVReader's createArray function with string passed in from GUI
+               myCSVReader.createArray(textField1.getText()); //calls CSVReader's createArray function with string passed in from GUI
                 destroyCVSGUI();
                 //Destroy the JFrame object
 

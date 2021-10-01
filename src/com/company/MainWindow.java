@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class MainWindow {
 
@@ -19,12 +21,12 @@ public class MainWindow {
     private JLabel cpuNumbLabel;
     private JLabel execStatus;
     private JLabel timeLabel;
+    private JTextField CSVEntryField;
 
     public MainWindow() {
 
-
+        CSVReader myCSVReader = new CSVReader();
         //Initialize table contents here
-        createTable();
 
         startSystemButton.addActionListener(new ActionListener() {
             @Override
@@ -33,6 +35,24 @@ public class MainWindow {
 
                 execStatus.setText("exec: running");
                 //Call some system run function
+
+                String timeField;
+                timeField = timeUnitTextField.getText();
+                int timeMultiplier = Integer.parseInt(timeField);
+                Process procObject = new Process((double)10 * timeMultiplier/1000); // create a runnable object  that will sleep for 4 seconds
+                Thread  mt = new Thread(procObject);    // add this object to a thread and start the thread
+                mt.start();
+
+                System.out.println("Started the thread");
+                // without the join, either thread can complete before the other
+                try {
+                    mt.join();  // wait for my thread to complete
+                } catch (Exception ex) {
+                    // TO DO handle system error here
+                }
+                System.out.println("Main program exiting");
+                System.exit(0);
+
             }
         });
 
@@ -47,22 +67,24 @@ public class MainWindow {
         });
 
 
+        CSVEntryField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                createTable(myCSVReader.createArray(CSVEntryField.getText())); //calls CSVReader's createArray function with string passed in from GUI
+            }
+        });
     }
 
-    private void createTable(){
-
+    private void createTable(ArrayList<Input> input){
+        DefaultTableModel table = new DefaultTableModel(null,new String[]{"Process Name", "Service Time"});
         //This is temporarily hardcoded, this will need to be dynamically assigned at runtime in the future
-        Object[][] data = {
-                //{column 1, column 2}
-                {"Process A", 10}, //row 1
-                {"Process B", 14}, //row 2
-                {"Process C", 4} //row 3
-                //{"Process X, X} //row X
-        };
-        processQueueTable.setModel(new DefaultTableModel(
-                data,
-                new String[]{"Process Name", "Service Time"} //number of entered strings is number of columns
-        ));
+        for(Input i: input){
+            Vector<String> row =new Vector<String>();
+            row.add(i.processID);
+            row.add(String.valueOf(i.serviceTime));
+            table.addRow(row);
+        }
+         processQueueTable.setModel(table);
     }
 
 
