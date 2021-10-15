@@ -15,13 +15,14 @@ public class MainWindow {
     private JLabel sysStatus;
     private JLabel waitingProcessQueueLabel;
     private JTable processQueueTable;
-    private JTextArea systemReportStatus;
     private JTextField timeUnitTextField;
     private JLabel timeUnitLabel;
     private JLabel cpuNumbLabel;
     private JLabel execStatus;
     private JLabel timeLabel;
     private JTextField CSVEntryField;
+    private JTable processInfoTable;
+    private JLabel currentThroughputLabel;
 
     public MainWindow() {
 
@@ -56,6 +57,7 @@ public class MainWindow {
             }
         });
 
+        //Pause Button Functionality
         pauseSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -66,18 +68,20 @@ public class MainWindow {
             }
         });
 
-
+        //File Entry Functionality; creates tables using CSVReader as parser
         CSVEntryField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                createTable(myCSVReader.createArray(CSVEntryField.getText())); //calls CSVReader's createArray function with string passed in from GUI
+                createQueueTable(myCSVReader.createArray(CSVEntryField.getText())); //calls CSVReader's createArray function with string passed in from GUI
+                createProcessInfoTable(myCSVReader.createArray(CSVEntryField.getText()));
             }
         });
     }
 
-    private void createTable(ArrayList<Input> input){
+
+    //Creates Process Queue Table
+    private void createQueueTable(ArrayList<Input> input){
         DefaultTableModel table = new DefaultTableModel(null,new String[]{"Process Name", "Service Time"});
-        //This is temporarily hardcoded, this will need to be dynamically assigned at runtime in the future
         for(Input i: input){
             Vector<String> row =new Vector<String>();
             row.add(i.processID);
@@ -87,7 +91,25 @@ public class MainWindow {
          processQueueTable.setModel(table);
     }
 
+    //Creates ProcessInfoTable
 
+    /*
+    As of now, the below table just repeats the above logic
+    for its creation and will need to be changed in order to
+    be dynamic during runtime
+     */
+    private void createProcessInfoTable(ArrayList<Input> input){
+        DefaultTableModel table = new DefaultTableModel(null,new String[]
+                {"Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"});
+        //This is temporarily hardcoded, this will need to be dynamically assigned at runtime in the future
+        for(Input i: input){
+            Vector<String> row =new Vector<String>();
+            row.add(i.processID);
+            row.add(String.valueOf(i.serviceTime));
+            table.addRow(row);
+        }
+        processInfoTable.setModel(table);
+    }
     //Constructor
     public void createGUI(){
         JFrame frame = new JFrame("Phase 1 GUI");
