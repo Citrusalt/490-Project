@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -25,22 +26,44 @@ public class MainWindow {
     private JLabel currentThroughputLabel;
 
     public MainWindow() {
+        System.out.println("MainWindow Constructor");
 
-        CSVReader myCSVReader = new CSVReader();
         //Initialize table contents here
+
 
         startSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        //Pause Button Functionality
+        pauseSystemButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sysStatus.setText("System Paused");
+
+                execStatus.setText("exec: idle");
+
+                //call some system pause function
+            }
+        });
+
+        //File Entry Functionality; creates tables using CSVReader as parser
+        CSVEntryField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ProcessQueue myProcessQueue = ProcessQueue.getInstance(CSVEntryField.getText());
+                Dispatcher myDispatcher = new Dispatcher(myProcessQueue.Queue);
                 sysStatus.setText("System Running");
 
                 execStatus.setText("exec: running");
                 //Call some system run function
-
                 String timeField;
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
-                Process procObject = new Process((double)10 * timeMultiplier/1000); // create a runnable object  that will sleep for 4 seconds
+                Process procObject = new Process(myDispatcher,(double)timeMultiplier/1000); // create a runnable object  that will sleep for 4 seconds
                 Thread  mt = new Thread(procObject);    // add this object to a thread and start the thread
                 mt.start();
 
@@ -54,26 +77,8 @@ public class MainWindow {
                 System.out.println("Main program exiting");
                 System.exit(0);
 
-            }
-        });
-
-        //Pause Button Functionality
-        pauseSystemButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sysStatus.setText("System Paused");
-
-                execStatus.setText("exec: idle");
-                //call some system pause function
-            }
-        });
-
-        //File Entry Functionality; creates tables using CSVReader as parser
-        CSVEntryField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                createQueueTable(myCSVReader.createArray(CSVEntryField.getText())); //calls CSVReader's createArray function with string passed in from GUI
-                createProcessInfoTable(myCSVReader.createArray(CSVEntryField.getText()));
+                createQueueTable(myProcessQueue.Queue); //calls CSVReader's createArray function with string passed in from GUI
+                createProcessInfoTable(myProcessQueue.Queue);
             }
         });
     }

@@ -15,7 +15,14 @@ import java.io.File;
 
 public class CSVReader {
 
-    public ArrayList<Input> createArray(String csv_filename){
+    private final String csv_filename;
+
+    CSVReader(String fileName){
+        csv_filename=fileName;
+    }
+
+
+    public ArrayList<Input> createArray(){
         //have the user input a file name
 
         File csv = new File(csv_filename);
@@ -44,7 +51,10 @@ public class CSVReader {
             e.printStackTrace();
         }
         //System.out.println(Arrays.deepToString(data.toArray()));
-        System.out.println(dataAry);
+        System.out.println(dataAry.get(0).serviceTime);
+        System.out.println(dataAry.get(1).serviceTime);
+        System.out.println(dataAry.get(2).serviceTime);
+        System.out.println(dataAry.get(3).serviceTime);
         return dataAry;
 
     }
