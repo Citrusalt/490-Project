@@ -18,7 +18,7 @@ public class Process implements Runnable{
             try {
                 Thread.sleep((long)(serviceTime*sleepN*1000));  // sleepN needs to be converted to milliseconds
             } catch (InterruptedException ex) {
-                // TBD catch and deal with exception er
+                // TBD catch and deal with exception6 er
             }
             processDispatcher.RemoveLast();
         }

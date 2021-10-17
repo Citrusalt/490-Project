@@ -57,14 +57,23 @@ public class MainWindow {
                 Dispatcher myDispatcher = new Dispatcher(CSVEntryField.getText());
                 sysStatus.setText("System Running");
 
+                createQueueTable(myDispatcher.myProcessQueue.Queue);
+
                 execStatus.setText("exec: running");
                 //Call some system run function
                 String timeField;
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
+
+
                 Process procObject = new Process(myDispatcher,(double)timeMultiplier/1000); // create a runnable object  that will sleep for 4 seconds
                 Thread  mt = new Thread(procObject);    // add this object to a thread and start the thread
-                mt.start();
+
+                SwingUtilities.invokeLater(mt);
+
+
+                mt.start(); //start thread
+
 
                 System.out.println("Started the thread");
                 // without the join, either thread can complete before the other
@@ -74,10 +83,9 @@ public class MainWindow {
                     // TO DO handle system error here
                 }
                 System.out.println("Main program exiting");
-                System.exit(0);
 
-//                createQueueTable(myProcessQueue.Queue); //calls CSVReader's createArray function with string passed in from GUI
-//                createProcessInfoTable(myProcessQueue.Queue);
+
+
             }
         });
     }
@@ -109,7 +117,14 @@ public class MainWindow {
         for(Input i: input){
             Vector<String> row =new Vector<String>();
             row.add(i.processID);
+            row.add(String.valueOf(i.arrivalTime));
             row.add(String.valueOf(i.serviceTime));
+            row.add("X");
+            row.add("Y");
+            row.add("Z");
+
+
+
             table.addRow(row);
         }
         processInfoTable.setModel(table);
@@ -122,4 +137,6 @@ public class MainWindow {
         frame.pack();
         frame.setVisible(true);
     }
+
+
 }
