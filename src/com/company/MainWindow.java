@@ -5,6 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class MainWindow {
@@ -73,11 +74,17 @@ public class MainWindow {
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
 
+
+
                 double sleepN = (double)timeMultiplier/1000;
+
+                startThread(myDispatcher, sleepN);
+
 //                Process procObject = new Process(myDispatcher,sleepN); // create a runnable object  that will sleep for 4 seconds
 //                Thread  mt = new Thread(procObject);    // add this object to a thread and start the thread
 //                mt.start(); //start thread
 
+/*
                 Runnable thread = new Runnable() {
                     public void run() {
                         int serviceTime = myDispatcher.PassProcess().serviceTime;
@@ -97,6 +104,11 @@ public class MainWindow {
 
                 }
 
+ */
+
+
+
+
 
                 System.out.println("Started the thread");
                 // without the join, either thread can complete before the other
@@ -113,6 +125,47 @@ public class MainWindow {
         });
     }
 
+    private void startThread(Dispatcher myDispatcher, double sleepN){
+
+
+        SwingWorker<Void, Input> worker = new SwingWorker<Void, Input>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+
+
+
+                for (int i =0; i<myDispatcher.sizeQueue;i++ ) {
+                    System.out.println("Process " + i + " being executed");
+                    int serviceTime = myDispatcher.PassProcess().serviceTime;
+                    System.out.println("  ...  ...  Slumber thread is sleeping for " + serviceTime*sleepN+ " seconds");
+
+                    publish(myDispatcher.PassProcess());
+
+                    try {
+                        Thread.sleep((long)(serviceTime*sleepN*1000));  // sleepN needs to be converted to milliseconds
+                    } catch (InterruptedException ex) {
+                        // TBD catch and deal with exception6 er
+                    }
+                    myDispatcher.RemoveLast();
+
+                }
+                System.out.println("  ...  ...  Slumber thread has woken up ");
+
+                return null;
+            }
+
+            @Override
+            protected void process(List<Input> chunks) {
+
+                addRowProcessInfoTable(chunks.get(chunks.size() - 1));
+                removeRowQueueTable((chunks.size() - 1));
+
+            }
+        };
+
+        worker.execute();
+
+    }
 
     //Creates Table with column names
     private void createQueueTable(){
@@ -157,6 +210,7 @@ public class MainWindow {
         row.add("Z");
         infoTable.addRow(row);
     }
+
 
 
     //Constructor
