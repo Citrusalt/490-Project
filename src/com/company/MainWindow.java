@@ -65,23 +65,38 @@ public class MainWindow {
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
 
+                double sleepN = (double)timeMultiplier/1000;
+//                Process procObject = new Process(myDispatcher,sleepN); // create a runnable object  that will sleep for 4 seconds
+//                Thread  mt = new Thread(procObject);    // add this object to a thread and start the thread
+//                mt.start(); //start thread
 
-                Process procObject = new Process(myDispatcher,(double)timeMultiplier/1000); // create a runnable object  that will sleep for 4 seconds
-                Thread  mt = new Thread(procObject);    // add this object to a thread and start the thread
+                Runnable thread = new Runnable() {
+                    public void run() {
+                        int serviceTime = myDispatcher.PassProcess().serviceTime;
+                        System.out.println("  ...  ...  Slumber thread is sleeping for " + serviceTime * sleepN + " seconds");
+                        try {
+                            Thread.sleep((long) (serviceTime * sleepN * 1000));  // sleepN needs to be converted to milliseconds
+                        } catch (InterruptedException ex) {
+                            // TBD catch and deal with exception6 er
+                        }
+                        myDispatcher.RemoveLast();
+                        System.out.println("  ...  ...  Slumber thread has woken up ");
+                    }
+                };
+                for (int i =0; i<myDispatcher.sizeQueue;i++ ) {
 
-                SwingUtilities.invokeLater(mt);
+                    SwingUtilities.invokeLater((thread));
 
-
-                mt.start(); //start thread
+                }
 
 
                 System.out.println("Started the thread");
                 // without the join, either thread can complete before the other
-                try {
-                    mt.join();  // wait for my thread to complete
-                } catch (Exception ex) {
-                    // TO DO handle system error here
-                }
+//                try {
+//                    mt.join();  // wait for my thread to complete
+//                } catch (Exception ex) {
+//                    // TO DO handle system error here
+//                }
                 System.out.println("Main program exiting");
 
 
