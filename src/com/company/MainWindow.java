@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -24,16 +23,22 @@ public class MainWindow {
     private JTextField CSVEntryField;
     private JTable processInfoTable;
     private JLabel currentThroughputLabel;
+    DefaultTableModel queueTable = new DefaultTableModel();
+    DefaultTableModel infoTable = new DefaultTableModel();
+
 
     public MainWindow() {
         System.out.println("MainWindow Constructor");
 
-        //Initialize table contents here
-
+        //Table Creation:
+        createQueueTable();
+        createProcessInfoTable();
 
         startSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                //Does nothing as of right now
 
             }
         });
@@ -57,7 +62,10 @@ public class MainWindow {
                 Dispatcher myDispatcher = new Dispatcher(CSVEntryField.getText());
                 sysStatus.setText("System Running");
 
-                createQueueTable(myDispatcher.myProcessQueue.Queue);
+                //Iterate through the Dispatcher's Process Queue to add rows to table
+                for (int i = 0; i < myDispatcher.sizeQueue; i++){
+                    addRowQueueTable(myDispatcher.myProcessQueue.Queue.get(i));
+                }
 
                 execStatus.setText("exec: running");
                 //Call some system run function
@@ -106,44 +114,51 @@ public class MainWindow {
     }
 
 
-    //Creates Process Queue Table
-    private void createQueueTable(ArrayList<Input> input){
-        DefaultTableModel table = new DefaultTableModel(null,new String[]{"Process Name", "Service Time"});
-        for(Input i: input){
-            Vector<String> row =new Vector<String>();
-            row.add(i.processID);
-            row.add(String.valueOf(i.serviceTime));
-            table.addRow(row);
-        }
-         processQueueTable.setModel(table);
+    //Creates Table with column names
+    private void createQueueTable(){
+        queueTable.addColumn("Process Name");
+        queueTable.addColumn("Service Time");
+        processQueueTable.setModel(queueTable);
     }
 
-    //Creates ProcessInfoTable
-
-    /*
-    As of now, the below table just repeats the above logic
-    for its creation and will need to be changed in order to
-    be dynamic during runtime
-     */
-    private void createProcessInfoTable(ArrayList<Input> input){
-        DefaultTableModel table = new DefaultTableModel(null,new String[]
-                {"Process Name", "Arrival Time", "Service Time", "Finish Time", "TAT", "nTAT"});
-        //This is temporarily hardcoded, this will need to be dynamically assigned at runtime in the future
-        for(Input i: input){
-            Vector<String> row =new Vector<String>();
-            row.add(i.processID);
-            row.add(String.valueOf(i.arrivalTime));
-            row.add(String.valueOf(i.serviceTime));
-            row.add("X");
-            row.add("Y");
-            row.add("Z");
-
-
-
-            table.addRow(row);
-        }
-        processInfoTable.setModel(table);
+    //Function to add a row to the Queue Table by passing in an object of type Input
+    private void addRowQueueTable(Input myInput)
+    {
+        Vector<String> row =new Vector<String>();
+        row.add(myInput.processID);
+        row.add(String.valueOf(myInput.serviceTime));
+        queueTable.addRow(row);
     }
+
+    //Function to remove specified row with number
+    private void removeRowQueueTable(int i){
+        queueTable.removeRow(i);
+    }
+
+    //Creates the Process Info Table with column names
+    private void createProcessInfoTable(){
+        infoTable.addColumn("Process Name");
+        infoTable.addColumn("Arrival Time");
+        infoTable.addColumn("Service Time");
+        infoTable.addColumn("Finish Time");
+        infoTable.addColumn("TAT");
+        infoTable.addColumn("nTAT");
+        processInfoTable.setModel(infoTable);
+    }
+
+    //Function to add row with passed in object of type Input
+    private void addRowProcessInfoTable(Input myInput){
+        Vector<String> row =new Vector<String>();
+        row.add(myInput.processID);
+        row.add(String.valueOf(myInput.arrivalTime));
+        row.add(String.valueOf(myInput.serviceTime));
+        row.add("X");
+        row.add("Y");
+        row.add("Z");
+        infoTable.addRow(row);
+    }
+
+
     //Constructor
     public void createGUI(){
         JFrame frame = new JFrame("Phase 1 GUI");
