@@ -7,6 +7,7 @@ public class Process implements Runnable{
     public Process(Dispatcher D, double N) {
         sleepN = N;
         processDispatcher=D;
+
     }
     public void run(){
 

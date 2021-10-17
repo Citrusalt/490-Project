@@ -4,21 +4,21 @@ import java.util.ArrayList;
 
 public class Dispatcher {
 
-    protected ArrayList<Input> DispatcherQueue;
+    protected ProcessQueue myProcessQueue;
     public int sizeQueue;
 
-    Dispatcher(ArrayList<Input> inputAry) {
+    Dispatcher(String filename) {
         System.out.println("Dispatcher Made");
-       DispatcherQueue = inputAry;
-       sizeQueue=DispatcherQueue.size();
+        myProcessQueue = ProcessQueue.getInstance(filename);
+        sizeQueue=myProcessQueue.Queue.size();
     }
 
     public Input PassProcess(){
-        return DispatcherQueue.get(0);
+        return myProcessQueue.Queue.get(0);
     }
 
     public void RemoveLast(){
-        DispatcherQueue.remove(0);
+        myProcessQueue.Queue.remove(0);
     }
 
 }

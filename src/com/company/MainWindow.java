@@ -54,8 +54,7 @@ public class MainWindow {
         CSVEntryField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ProcessQueue myProcessQueue = ProcessQueue.getInstance(CSVEntryField.getText());
-                Dispatcher myDispatcher = new Dispatcher(myProcessQueue.Queue);
+                Dispatcher myDispatcher = new Dispatcher(CSVEntryField.getText());
                 sysStatus.setText("System Running");
 
                 execStatus.setText("exec: running");
@@ -77,8 +76,8 @@ public class MainWindow {
                 System.out.println("Main program exiting");
                 System.exit(0);
 
-                createQueueTable(myProcessQueue.Queue); //calls CSVReader's createArray function with string passed in from GUI
-                createProcessInfoTable(myProcessQueue.Queue);
+//                createQueueTable(myProcessQueue.Queue); //calls CSVReader's createArray function with string passed in from GUI
+//                createProcessInfoTable(myProcessQueue.Queue);
             }
         });
     }
