@@ -27,6 +27,7 @@ public class MainWindow {
     DefaultTableModel queueTable = new DefaultTableModel();
     DefaultTableModel infoTable = new DefaultTableModel();
     private int time1=0;
+    private int completedProcesses = 0;
 
     public MainWindow() {
         System.out.println("MainWindow Constructor");
@@ -127,14 +128,13 @@ public class MainWindow {
 
     private void startThread(Dispatcher myDispatcher, double sleepN){
 
-
         SwingWorker<Void, Input> worker = new SwingWorker<Void, Input>() {
             @Override
             protected Void doInBackground() throws Exception {
 
+            currentThroughputLabel.setText("Current Throughput: 0 process/" + timeUnitTextField.getText());
 
-
-                for (int i =0; i<myDispatcher.sizeQueue;i++ ) {
+                for (int i =0; i<myDispatcher.sizeQueue; i++) {
                     System.out.println("Process " + i + " being executed");
                     int serviceTime = myDispatcher.PassProcess().serviceTime;
                     System.out.println("  ...  ...  Slumber thread is sleeping for " + serviceTime*sleepN+ " seconds");
@@ -146,10 +146,16 @@ public class MainWindow {
                     } catch (InterruptedException ex) {
                         // TBD catch and deal with exception6 er
                     }
+                    completedProcesses++;
+                    updateThroughput();
+
                     myDispatcher.RemoveLast();
 
                 }
                 System.out.println("  ...  ...  Slumber thread has woken up ");
+
+
+
 
                 return null;
             }
@@ -159,6 +165,10 @@ public class MainWindow {
 
                 addRowProcessInfoTable(chunks.get(chunks.size() - 1));
                 removeRowQueueTable((chunks.size() - 1));
+
+
+
+
 
             }
         };
@@ -209,6 +219,20 @@ public class MainWindow {
         row.add(String.valueOf(time1- myInput.arrivalTime));
         row.add(String.valueOf((time1- myInput.arrivalTime)/ myInput.serviceTime));
         infoTable.addRow(row);
+    }
+
+    private void updateThroughput(){
+
+
+        double throughput = (double)completedProcesses/time1;
+
+        currentThroughputLabel.setText("Current Throughput: " + throughput + " process/" + timeUnitTextField.getText());
+        System.out.println(completedProcesses);
+        System.out.println(time1);
+        System.out.println(throughput);
+
+
+
     }
 
 

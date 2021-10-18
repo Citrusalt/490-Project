@@ -54,7 +54,7 @@ public class CSVReader {
         System.out.println(dataAry.get(0).serviceTime);
         System.out.println(dataAry.get(1).serviceTime);
         System.out.println(dataAry.get(2).serviceTime);
-        System.out.println(dataAry.get(3).serviceTime);
+
         return dataAry;
 
     }
