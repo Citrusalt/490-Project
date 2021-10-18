@@ -4,7 +4,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Vector;
 
@@ -18,12 +19,15 @@ public class MainWindow {
     private JTable processQueueTable;
     private JTextField timeUnitTextField;
     private JLabel timeUnitLabel;
-    private JLabel cpuNumbLabel;
-    private JLabel execStatus;
-    private JLabel timeLabel;
+    private JLabel cpuNumbLabel1;
+    private JLabel execStatus1;
+    private JLabel timeLabel1;
     private JTextField CSVEntryField;
     private JTable processInfoTable;
     private JLabel currentThroughputLabel;
+    private JLabel cpuNumbLabel2;
+    private JLabel timeLabel2;
+    private JLabel execStatus2;
     DefaultTableModel queueTable = new DefaultTableModel();
     DefaultTableModel infoTable = new DefaultTableModel();
     private int time1=0;
@@ -51,7 +55,7 @@ public class MainWindow {
             public void actionPerformed(ActionEvent e) {
                 sysStatus.setText("System Paused");
 
-                execStatus.setText("exec: idle");
+                execStatus1.setText("exec: idle");
 
                 //call some system pause function
             }
@@ -69,7 +73,7 @@ public class MainWindow {
                     addRowQueueTable(myDispatcher.myProcessQueue.Queue.get(i));
                 }
 
-                execStatus.setText("exec: running");
+                execStatus1.setText("exec: running");
                 //Call some system run function
                 String timeField;
                 timeField = timeUnitTextField.getText();
@@ -124,6 +128,12 @@ public class MainWindow {
 
             }
         });
+        CSVEntryField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                    CSVEntryField.setText("");
+            }
+        });
     }
 
     private void startThread(Dispatcher myDispatcher, double sleepN){
@@ -166,10 +176,6 @@ public class MainWindow {
                 addRowProcessInfoTable(chunks.get(chunks.size() - 1));
                 removeRowQueueTable((chunks.size() - 1));
 
-
-
-
-
             }
         };
 
@@ -196,6 +202,7 @@ public class MainWindow {
     //Function to remove specified row with number
     private void removeRowQueueTable(int i){
         queueTable.removeRow(i);
+
     }
 
     //Creates the Process Info Table with column names
