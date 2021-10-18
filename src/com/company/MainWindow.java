@@ -26,7 +26,7 @@ public class MainWindow {
     private JLabel currentThroughputLabel;
     DefaultTableModel queueTable = new DefaultTableModel();
     DefaultTableModel infoTable = new DefaultTableModel();
-
+    private int time1=0;
 
     public MainWindow() {
         System.out.println("MainWindow Constructor");
@@ -205,9 +205,9 @@ public class MainWindow {
         row.add(myInput.processID);
         row.add(String.valueOf(myInput.arrivalTime));
         row.add(String.valueOf(myInput.serviceTime));
-        row.add("X");
-        row.add("Y");
-        row.add("Z");
+        row.add(String.valueOf(time1 = time1 + myInput.serviceTime));
+        row.add(String.valueOf(time1- myInput.arrivalTime));
+        row.add(String.valueOf((time1- myInput.arrivalTime)/ myInput.serviceTime));
         infoTable.addRow(row);
     }
 
