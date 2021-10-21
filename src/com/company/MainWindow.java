@@ -1,7 +1,5 @@
 package com.company;
 
-import com.sun.tools.javac.Main;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
@@ -9,28 +7,34 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.Timer;
 
-public class MainWindow implements GUIInterface{
+/*
+* Class MainWindow
+* Is the GUI
+* instantiates Dispatcher
+* displays both tables, results, etc
+* has update functions for GUI elements
+*/
+public class MainWindow{
 
     private JButton startSystemButton;
     private JButton pauseSystemButton;
+    private JLabel waitingProcessQueueLabel;
+    private JLabel cpuNumbLabel1;
+    private JLabel cpuNumbLabel2;
+    private JLabel timeUnitLabel;
     private JPanel mainPanel;
     private JLabel sysStatus;
-    private JLabel waitingProcessQueueLabel;
     public JTable processQueueTable;
     private JTextField timeUnitTextField;
-    private JLabel timeUnitLabel;
-    private JLabel cpuNumbLabel1;
     public JLabel execStatus1;
     public JLabel timeLabel1;
     private JTextField CSVEntryField;
     public JTable processInfoTable;
     private JLabel currentThroughputLabel;
-    private JLabel cpuNumbLabel2;
     public JLabel timeLabel2;
     public JLabel execStatus2;
     DefaultTableModel queueTable = new DefaultTableModel();
@@ -110,7 +114,7 @@ public class MainWindow implements GUIInterface{
     }
 
     //Function to add a row to the Queue Table by passing in an object of type Input
-    @Override
+
     public void addRowQueueTable(Input myInput)
     {
         Vector<String> row =new Vector<String>();
@@ -120,7 +124,7 @@ public class MainWindow implements GUIInterface{
     }
 
     //Function to remove specified row with number
-    @Override
+
     public void removeRowQueueTable(int i){
         queueTable.removeRow(i);
 
@@ -138,7 +142,7 @@ public class MainWindow implements GUIInterface{
     }
 
     //Function to add row with passed in object of type Input
-    @Override
+
     public void addRowProcessInfoTable(Input myInput){
         Vector<String> row =new Vector<String>();
         row.add(myInput.processID);
@@ -149,18 +153,15 @@ public class MainWindow implements GUIInterface{
         row.add(String.valueOf((time1- myInput.arrivalTime)/ myInput.serviceTime));
         infoTable.addRow(row);
     }
-    @Override
+    //updates throughput
     public void updateThroughput(){
 
         double throughput = (double)completedProcesses/time1;
 
         currentThroughputLabel.setText("Current Throughput: " + throughput + " process/" + timeUnitTextField.getText());
-//        System.out.println(completedProcesses);
-//        System.out.println(time1);
-//        System.out.println(throughput);
 
     }
-    @Override
+    //updates timelabel1
     public void setTimeLabel1(int servicetime, double sleepN){
 
         timer1.scheduleAtFixedRate(new TimerTask() {
@@ -172,7 +173,7 @@ public class MainWindow implements GUIInterface{
         }, 0, 1000);
 
     }
-    @Override
+    //updates timelabel2
     public void setTimeLabel2(int servicetime, double sleepN){
 
         timer2.scheduleAtFixedRate(new TimerTask() {
@@ -185,11 +186,11 @@ public class MainWindow implements GUIInterface{
         }, 0, 1000);
 
     }
-    @Override
+    //updates exec status 1
     public void setExecStatus1(String processID){
         execStatus1.setText("Process: " +processID);
     }
-    @Override
+    //updates exec status 1
     public void setExecStatus2(String processID){
         execStatus2.setText("Process: " +processID);
     }

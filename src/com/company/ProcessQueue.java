@@ -1,6 +1,11 @@
 package com.company;
 import java.util.ArrayList;
 
+/*
+* Class ProcessQueue
+* singleton queue on Input objects
+*/
+
 public class ProcessQueue {
     private static ProcessQueue x=null;
     public ArrayList<Input> Queue;

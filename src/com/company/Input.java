@@ -1,5 +1,11 @@
 package com.company;
 
+/*
+* Class Input
+* Provides object for passing file contents
+* one Input object represents one process
+*/
+
 public class Input {
         int arrivalTime;
         String processID;

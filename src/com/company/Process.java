@@ -2,13 +2,20 @@ package com.company;
 
 import javax.swing.*;
 import java.util.List;
+/*
+* Process Class
+* Thread using swing workers
+* takes process and simulates it execution
+* updates relevant GUI elements using dispatcher functions
+*/
+
 
 public class Process extends SwingWorker<Boolean, Input> {
 
-        private Input currentProcess;
-        private double sleepN;
-        private Dispatcher myDispatcher;
-        private int num;
+        private Input currentProcess;//process being executed
+        private double sleepN;//time unit
+        private Dispatcher myDispatcher;//the dispatcher
+        private int num;//1st or 2nd thread
 
         public Process(Dispatcher D, Input I, double N, int threadNum) {
             myDispatcher=D;
@@ -20,7 +27,8 @@ public class Process extends SwingWorker<Boolean, Input> {
         @Override
         protected Boolean doInBackground() throws Exception {
             System.out.println("Thread " + num + " Started");
-            publish(currentProcess);
+            publish(currentProcess);//update GUI elements
+            //simulate execution of process
             try {
                 Thread.sleep((long)(currentProcess.serviceTime*sleepN*1000));  // sleepN needs to be converted to milliseconds
             } catch (InterruptedException ex) {
@@ -31,27 +39,27 @@ public class Process extends SwingWorker<Boolean, Input> {
         }
 
         @Override
-        protected void process(List<Input> chunks) {
+        protected void process(List<Input> chunks) {//before simulate execution
             super.process(chunks);
-          if(num==1){
+          if(num==1){//if 1st thread
 
-              myDispatcher.Thread1Before(currentProcess);
+              myDispatcher.Thread1Before(currentProcess);//update GUI
           }
-          else if(num==2){
+          else if(num==2){//if 2nd thread
 
-              myDispatcher.Thread2Before(currentProcess);
+              myDispatcher.Thread2Before(currentProcess);//update GUI
           }
 
         }
 
         @Override
-        protected void done() {
+        protected void done() {//when finished
             super.done();
-            if(num==1){
-                myDispatcher.Thread1After(currentProcess);
+            if(num==1){//if 1st thread
+                myDispatcher.Thread1After(currentProcess);//update GUI
             }
-            else if(num==2){
-                myDispatcher.Thread2After(currentProcess);
+            else if(num==2){//if 2 thread
+                myDispatcher.Thread2After(currentProcess);//update GUI
             }
         }
 };

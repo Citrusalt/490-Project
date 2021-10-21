@@ -12,13 +12,16 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.io.File;
 
-
+/*
+*  Class CSVReader
+*  read file and return contents as Input objects
+*/
 public class CSVReader {
 
-    private final String csv_filename;
+    private final String csv_filename;//name of csv file
 
     CSVReader(String fileName){
-        csv_filename=fileName;
+        csv_filename=fileName;//set file name
     }
 
 
@@ -34,7 +37,7 @@ public class CSVReader {
         ArrayList<Input> dataAry = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(csv)))
         {
-            while (br.ready())
+            while (br.ready())//assign contents to Input objects
             {
                 Input data = new Input();
                 String[] ary = br.readLine().split(",");
@@ -52,7 +55,7 @@ public class CSVReader {
         }
         //System.out.println(Arrays.deepToString(data.toArray()));
 
-        return dataAry;
+        return dataAry;//return Input objects
 
     }
 }
