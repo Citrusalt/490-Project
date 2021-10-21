@@ -51,9 +51,6 @@ public class CSVReader {
             e.printStackTrace();
         }
         //System.out.println(Arrays.deepToString(data.toArray()));
-        System.out.println(dataAry.get(0).serviceTime);
-        System.out.println(dataAry.get(1).serviceTime);
-        System.out.println(dataAry.get(2).serviceTime);
 
         return dataAry;
 

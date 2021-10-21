@@ -1,38 +1,46 @@
 package com.company;
 
+import com.sun.tools.javac.Main;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.Vector;
+import java.util.Timer;
 
-public class MainWindow {
+public class MainWindow implements GUIInterface{
 
     private JButton startSystemButton;
     private JButton pauseSystemButton;
     private JPanel mainPanel;
     private JLabel sysStatus;
     private JLabel waitingProcessQueueLabel;
-    private JTable processQueueTable;
+    public JTable processQueueTable;
     private JTextField timeUnitTextField;
     private JLabel timeUnitLabel;
     private JLabel cpuNumbLabel1;
-    private JLabel execStatus1;
-    private JLabel timeLabel1;
+    public JLabel execStatus1;
+    public JLabel timeLabel1;
     private JTextField CSVEntryField;
-    private JTable processInfoTable;
+    public JTable processInfoTable;
     private JLabel currentThroughputLabel;
     private JLabel cpuNumbLabel2;
-    private JLabel timeLabel2;
-    private JLabel execStatus2;
+    public JLabel timeLabel2;
+    public JLabel execStatus2;
     DefaultTableModel queueTable = new DefaultTableModel();
     DefaultTableModel infoTable = new DefaultTableModel();
     private int time1=0;
-    private int completedProcesses = 0;
-
+    public double sleepN=0;
+    public int completedProcesses = 0;
+    DecimalFormat decimalFormat=new DecimalFormat("#.000");
+    Timer timer1=new Timer();
+    Timer timer2=new Timer();
     public MainWindow() {
         System.out.println("MainWindow Constructor");
 
@@ -65,65 +73,21 @@ public class MainWindow {
         CSVEntryField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Dispatcher myDispatcher = new Dispatcher(CSVEntryField.getText());
-                sysStatus.setText("System Running");
-
-                //Iterate through the Dispatcher's Process Queue to add rows to table
-                for (int i = 0; i < myDispatcher.sizeQueue; i++){
-                    addRowQueueTable(myDispatcher.myProcessQueue.Queue.get(i));
-                }
-
-                execStatus1.setText("exec: running");
-                //Call some system run function
                 String timeField;
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
+                sleepN = (double)timeMultiplier/1000;
+                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN );
 
+                sysStatus.setText("System Running");
 
+                //Iterate through the Dispatcher's Process Queue to add rows to table
 
-                double sleepN = (double)timeMultiplier/1000;
-
-                startThread(myDispatcher, sleepN);
-
-//                Process procObject = new Process(myDispatcher,sleepN); // create a runnable object  that will sleep for 4 seconds
-//                Thread  mt = new Thread(procObject);    // add this object to a thread and start the thread
-//                mt.start(); //start thread
-
-/*
-                Runnable thread = new Runnable() {
-                    public void run() {
-                        int serviceTime = myDispatcher.PassProcess().serviceTime;
-                        System.out.println("  ...  ...  Slumber thread is sleeping for " + serviceTime * sleepN + " seconds");
-                        try {
-                            Thread.sleep((long) (serviceTime * sleepN * 1000));  // sleepN needs to be converted to milliseconds
-                        } catch (InterruptedException ex) {
-                            // TBD catch and deal with exception6 er
-                        }
-                        myDispatcher.RemoveLast();
-                        System.out.println("  ...  ...  Slumber thread has woken up ");
-                    }
-                };
-                for (int i =0; i<myDispatcher.sizeQueue;i++ ) {
-
-                    SwingUtilities.invokeLater((thread));
-
-                }
-
- */
-
-
-
-
-
-                System.out.println("Started the thread");
-                // without the join, either thread can complete before the other
-//                try {
-//                    mt.join();  // wait for my thread to complete
-//                } catch (Exception ex) {
-//                    // TO DO handle system error here
-//                }
-                System.out.println("Main program exiting");
-
+                //Call some system run function
+                setExecStatus1("Finished");
+                timeLabel1.setText("time remaining: 0");
+                setExecStatus2("Finished");
+                timeLabel2.setText("time remaining: 0");
 
 
             }
@@ -136,52 +100,7 @@ public class MainWindow {
         });
     }
 
-    private void startThread(Dispatcher myDispatcher, double sleepN){
 
-        SwingWorker<Void, Input> worker = new SwingWorker<Void, Input>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-
-            currentThroughputLabel.setText("Current Throughput: 0 process/" + timeUnitTextField.getText());
-
-                for (int i =0; i<myDispatcher.sizeQueue; i++) {
-                    System.out.println("Process " + i + " being executed");
-                    int serviceTime = myDispatcher.PassProcess().serviceTime;
-                    System.out.println("  ...  ...  Slumber thread is sleeping for " + serviceTime*sleepN+ " seconds");
-
-                    publish(myDispatcher.PassProcess());
-
-                    try {
-                        Thread.sleep((long)(serviceTime*sleepN*1000));  // sleepN needs to be converted to milliseconds
-                    } catch (InterruptedException ex) {
-                        // TBD catch and deal with exception6 er
-                    }
-                    completedProcesses++;
-                    updateThroughput();
-
-                    myDispatcher.RemoveLast();
-
-                }
-                System.out.println("  ...  ...  Slumber thread has woken up ");
-
-
-
-
-                return null;
-            }
-
-            @Override
-            protected void process(List<Input> chunks) {
-
-                addRowProcessInfoTable(chunks.get(chunks.size() - 1));
-                removeRowQueueTable((chunks.size() - 1));
-
-            }
-        };
-
-        worker.execute();
-
-    }
 
     //Creates Table with column names
     private void createQueueTable(){
@@ -191,7 +110,8 @@ public class MainWindow {
     }
 
     //Function to add a row to the Queue Table by passing in an object of type Input
-    private void addRowQueueTable(Input myInput)
+    @Override
+    public void addRowQueueTable(Input myInput)
     {
         Vector<String> row =new Vector<String>();
         row.add(myInput.processID);
@@ -200,7 +120,8 @@ public class MainWindow {
     }
 
     //Function to remove specified row with number
-    private void removeRowQueueTable(int i){
+    @Override
+    public void removeRowQueueTable(int i){
         queueTable.removeRow(i);
 
     }
@@ -217,7 +138,8 @@ public class MainWindow {
     }
 
     //Function to add row with passed in object of type Input
-    private void addRowProcessInfoTable(Input myInput){
+    @Override
+    public void addRowProcessInfoTable(Input myInput){
         Vector<String> row =new Vector<String>();
         row.add(myInput.processID);
         row.add(String.valueOf(myInput.arrivalTime));
@@ -227,27 +149,55 @@ public class MainWindow {
         row.add(String.valueOf((time1- myInput.arrivalTime)/ myInput.serviceTime));
         infoTable.addRow(row);
     }
-
-    private void updateThroughput(){
-
+    @Override
+    public void updateThroughput(){
 
         double throughput = (double)completedProcesses/time1;
 
         currentThroughputLabel.setText("Current Throughput: " + throughput + " process/" + timeUnitTextField.getText());
-        System.out.println(completedProcesses);
-        System.out.println(time1);
-        System.out.println(throughput);
-
-
+//        System.out.println(completedProcesses);
+//        System.out.println(time1);
+//        System.out.println(throughput);
 
     }
+    @Override
+    public void setTimeLabel1(int servicetime, double sleepN){
 
+        timer1.scheduleAtFixedRate(new TimerTask() {
+            double z=servicetime*sleepN;
+            @Override
+            public void run() {
+                timeLabel1.setText("time remaining:" + decimalFormat.format(z--));
+            }
+        }, 0, 1000);
 
+    }
+    @Override
+    public void setTimeLabel2(int servicetime, double sleepN){
+
+        timer2.scheduleAtFixedRate(new TimerTask() {
+            double z=servicetime*sleepN;
+            @Override
+            public void run() {
+                timeLabel2.setText("time remaining:" + decimalFormat.format(z--));
+
+            }
+        }, 0, 1000);
+
+    }
+    @Override
+    public void setExecStatus1(String processID){
+        execStatus1.setText("Process: " +processID);
+    }
+    @Override
+    public void setExecStatus2(String processID){
+        execStatus2.setText("Process: " +processID);
+    }
 
     //Constructor
     public void createGUI(){
         JFrame frame = new JFrame("Phase 1 GUI");
-        frame.setContentPane(new MainWindow().mainPanel);
+        frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);

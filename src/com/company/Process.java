@@ -1,27 +1,58 @@
 package com.company;
 
-public class Process implements Runnable{
+import javax.swing.*;
+import java.util.List;
 
-    double sleepN;
-    Dispatcher processDispatcher;
-    public Process(Dispatcher D, double N) {
-        sleepN = N;
-        processDispatcher=D;
+public class Process extends SwingWorker<Boolean, Input> {
 
-    }
-    public void run(){
+        private Input currentProcess;
+        private double sleepN;
+        private Dispatcher myDispatcher;
+        private int num;
 
-        for (int i =0; i<processDispatcher.sizeQueue;i++ ) {
-            System.out.println("Process " + i + " being executed");
-            int serviceTime = processDispatcher.PassProcess().serviceTime;
-            System.out.println("  ...  ...  Slumber thread is sleeping for " + serviceTime*sleepN+ " seconds");
+        public Process(Dispatcher D, Input I, double N, int threadNum) {
+            myDispatcher=D;
+            currentProcess=I;
+            sleepN=N;
+            num=threadNum;
+        }
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            System.out.println("Thread " + num + " Started");
+            publish(currentProcess);
             try {
-                Thread.sleep((long)(serviceTime*sleepN*1000));  // sleepN needs to be converted to milliseconds
+                Thread.sleep((long)(currentProcess.serviceTime*sleepN*1000));  // sleepN needs to be converted to milliseconds
             } catch (InterruptedException ex) {
                 // TBD catch and deal with exception6 er
             }
-            processDispatcher.RemoveLast();
+
+            return true;
         }
-        System.out.println("  ...  ...  Slumber thread has woken up ");
-    }
-}
+
+        @Override
+        protected void process(List<Input> chunks) {
+            super.process(chunks);
+          if(num==1){
+
+              myDispatcher.Thread1Before(currentProcess);
+          }
+          else if(num==2){
+
+              myDispatcher.Thread2Before(currentProcess);
+          }
+
+        }
+
+        @Override
+        protected void done() {
+            super.done();
+            if(num==1){
+                myDispatcher.Thread1After(currentProcess);
+            }
+            else if(num==2){
+                myDispatcher.Thread2After(currentProcess);
+            }
+        }
+};
+
