@@ -156,9 +156,11 @@ public class MainWindow{
     //updates throughput
     public void updateThroughput(){
 
+        completedProcesses++;
+
         double throughput = (double)completedProcesses/time1;
 
-        currentThroughputLabel.setText("Current Throughput: " + throughput + " process/" + timeUnitTextField.getText());
+        currentThroughputLabel.setText("Current Throughput: " + throughput);
 
     }
     //updates timelabel1
