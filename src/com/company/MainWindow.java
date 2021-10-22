@@ -158,7 +158,7 @@ public class MainWindow{
 
         completedProcesses++;
 
-        double throughput = (double)completedProcesses/time1;
+        double throughput = (double)completedProcesses/(time1 * sleepN); //calculate throughput
 
         currentThroughputLabel.setText("Current Throughput: " + throughput);
 
