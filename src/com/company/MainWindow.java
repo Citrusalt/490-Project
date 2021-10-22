@@ -45,6 +45,7 @@ public class MainWindow{
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
     Timer timer1=new Timer();
     Timer timer2=new Timer();
+
     public MainWindow() {
         System.out.println("MainWindow Constructor");
 
@@ -56,8 +57,21 @@ public class MainWindow{
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                //Does nothing as of right now
+                String timeField;
+                timeField = timeUnitTextField.getText();
+                int timeMultiplier = Integer.parseInt(timeField);
+                sleepN = (double)timeMultiplier/1000;
+                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN );
 
+                sysStatus.setText("System Running");
+
+                //Iterate through the Dispatcher's Process Queue to add rows to table
+
+                //Call some system run function
+                setExecStatus1("Finished");
+                timeLabel1.setText("time remaining: 0");
+                setExecStatus2("Finished");
+                timeLabel2.setText("time remaining: 0");
             }
         });
 
