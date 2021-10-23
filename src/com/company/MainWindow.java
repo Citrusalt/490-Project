@@ -53,6 +53,7 @@ public class MainWindow{
         createQueueTable();
         createProcessInfoTable();
 
+        //Allow start button to begin system processes
         startSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -83,7 +84,15 @@ public class MainWindow{
 
                 execStatus1.setText("exec: idle");
 
-                //call some system pause function
+                //call system pause function
+                try {
+                    //sleep the thread as a "pause" for a long period of time
+                    Thread.sleep(20000);
+                    //tried to interrupt as a form of resume, but it didn't act right
+                    //this also only pauses GUI for some reason and not processes
+                } catch (InterruptedException ex) {
+                    return;
+                }
             }
         });
 
