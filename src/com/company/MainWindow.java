@@ -37,8 +37,13 @@ public class MainWindow{
     private JLabel currentThroughputLabel;
     public JLabel timeLabel2;
     public JLabel execStatus2;
+    private JTable processQueueTable2;
+    private JTable processInfoTable2;
+    private JLabel currentThroughputLabel2;
     DefaultTableModel queueTable = new DefaultTableModel();
     DefaultTableModel infoTable = new DefaultTableModel();
+    DefaultTableModel queueTable2 = new DefaultTableModel();
+    DefaultTableModel infoTable2 = new DefaultTableModel();
     private int time1=0;
     public double sleepN=0;
     public int completedProcesses = 0;
@@ -52,6 +57,8 @@ public class MainWindow{
         //Table Creation:
         createQueueTable();
         createProcessInfoTable();
+        createProcessInfoTable2();
+        createQueueTable2();
 
         //Allow start button to begin system processes
         startSystemButton.addActionListener(new ActionListener() {
@@ -136,8 +143,14 @@ public class MainWindow{
         processQueueTable.setModel(queueTable);
     }
 
-    //Function to add a row to the Queue Table by passing in an object of type Input
+    //Creates Table with column names
+    private void createQueueTable2(){
+        queueTable2.addColumn("Process Name");
+        queueTable2.addColumn("Service Time");
+        processQueueTable2.setModel(queueTable2);
+    }
 
+    //Function to add a row to the Queue Table by passing in an object of type Input
     public void addRowQueueTable(Input myInput)
     {
         Vector<String> row =new Vector<String>();
@@ -145,12 +158,20 @@ public class MainWindow{
         row.add(String.valueOf(myInput.serviceTime));
         queueTable.addRow(row);
     }
+    public void addRowQueueTable2(Input myInput)
+    {
+        Vector<String> row =new Vector<String>();
+        row.add(myInput.processID);
+        row.add(String.valueOf(myInput.serviceTime));
+        queueTable2.addRow(row);
+    }
 
     //Function to remove specified row with number
-
     public void removeRowQueueTable(int i){
         queueTable.removeRow(i);
-
+    }
+    public void removeRowQueueTable2(int i){
+        queueTable2.removeRow(i);
     }
 
     //Creates the Process Info Table with column names
@@ -162,6 +183,16 @@ public class MainWindow{
         infoTable.addColumn("TAT");
         infoTable.addColumn("nTAT");
         processInfoTable.setModel(infoTable);
+    }
+    //Creates the Process Info Table #2 with column names
+    private void createProcessInfoTable2(){
+        infoTable2.addColumn("Process Name");
+        infoTable2.addColumn("Arrival Time");
+        infoTable2.addColumn("Service Time");
+        infoTable2.addColumn("Finish Time");
+        infoTable2.addColumn("TAT");
+        infoTable2.addColumn("nTAT");
+        processInfoTable2.setModel(infoTable2);
     }
 
     //Function to add row with passed in object of type Input
@@ -176,15 +207,29 @@ public class MainWindow{
         row.add(String.valueOf((time1- myInput.arrivalTime)/ myInput.serviceTime));
         infoTable.addRow(row);
     }
+    public void addRowProcessInfoTable2(Input myInput){
+        Vector<String> row =new Vector<String>();
+        row.add(myInput.processID);
+        row.add(String.valueOf(myInput.arrivalTime));
+        row.add(String.valueOf(myInput.serviceTime));
+        row.add(String.valueOf(time1 = time1 + myInput.serviceTime));
+        row.add(String.valueOf(time1- myInput.arrivalTime));
+        row.add(String.valueOf((time1- myInput.arrivalTime)/ myInput.serviceTime));
+        infoTable2.addRow(row);
+    }
     //updates throughput
     public void updateThroughput(){
 
         completedProcesses++;
-
         double throughput = (double)completedProcesses/(time1 * sleepN); //calculate throughput
-
         currentThroughputLabel.setText("Current Throughput: " + throughput);
+    }
+    //updates throughput
+    public void updateThroughput2(){
 
+        completedProcesses++;
+        double throughput = (double)completedProcesses/(time1 * sleepN); //calculate throughput
+        currentThroughputLabel2.setText("Current Throughput: " + throughput);
     }
     //updates timelabel1
     public void setTimeLabel1(int servicetime, double sleepN){

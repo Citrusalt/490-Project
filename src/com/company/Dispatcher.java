@@ -23,6 +23,7 @@ public class Dispatcher {
         sleepN = N;
         for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
             this.myMainWindow.addRowQueueTable(myProcessQueue.Queue.get(i));
+            this.myMainWindow.addRowQueueTable2(myProcessQueue.Queue.get(i));
         }
         //start thread execution
         Thread1 = new Process(this, PassProcess(), sleepN, 1);
@@ -47,6 +48,7 @@ public class Dispatcher {
     private void Thread1Done() {//when thread1 done, update throughtput and do next process if not empty
         System.out.println("Thread1 Done");
         this.myMainWindow.updateThroughput();
+        //this.myMainWindow.updateThroughput2();
         if (!myProcessQueue.Queue.isEmpty()) {
             Thread1 = new Process(this, PassProcess(), sleepN, 1);
             RemoveLast();
@@ -63,6 +65,7 @@ public class Dispatcher {
     private void Thread2Done() {//when thread2 done, update throughtput and do next process if not empty
         System.out.println("Thread2 Done");
         this.myMainWindow.updateThroughput();
+        //this.myMainWindow.updateThroughput2();
         if (!myProcessQueue.Queue.isEmpty()) {
             Thread2 = new Process(this, PassProcess(), sleepN, 2);
             RemoveLast();
@@ -81,13 +84,15 @@ public class Dispatcher {
         this.myMainWindow.setExecStatus1(currentProcess.processID);
         this.myMainWindow.setTimeLabel1(currentProcess.serviceTime, sleepN);
         this.myMainWindow.removeRowQueueTable(0);
+        this.myMainWindow.removeRowQueueTable2(0);
 
     }
 
     public void Thread1After(Input currentProcess) {//update GUI after simulated process
         System.out.println("Thread1 After");
         System.out.println(currentProcess.processID);
-        this.myMainWindow.addRowProcessInfoTable(currentProcess);
+        this.myMainWindow.addRowProcessInfoTable(currentProcess); //table 1
+        this.myMainWindow.addRowProcessInfoTable2(currentProcess); //table 2
         Thread1Done();
     }
 
@@ -96,13 +101,15 @@ public class Dispatcher {
         this.myMainWindow.setExecStatus2(currentProcess.processID);
         this.myMainWindow.setTimeLabel2(currentProcess.serviceTime, sleepN);
         this.myMainWindow.removeRowQueueTable(0);
+        this.myMainWindow.removeRowQueueTable2(0);
 
     }
 
     public void Thread2After(Input currentProcess) {//update GUI after simulated process
         System.out.println("Thread2 After");
         System.out.println(currentProcess.processID);
-        this.myMainWindow.addRowProcessInfoTable(currentProcess);
+        this.myMainWindow.addRowProcessInfoTable(currentProcess); //table 1
+        this.myMainWindow.addRowProcessInfoTable2(currentProcess); //table 2
         Thread2Done();
     }
 
