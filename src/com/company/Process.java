@@ -41,26 +41,18 @@ public class Process extends SwingWorker<Boolean, Input> {
         @Override
         protected void process(List<Input> chunks) {//before simulate execution
             super.process(chunks);
-          if(num==1){//if 1st thread
 
-              myDispatcher.Thread1Before(currentProcess);//update GUI
-          }
-          else if(num==2){//if 2nd thread
+              myDispatcher.ThreadBefore(currentProcess);//update GUI
 
-              myDispatcher.Thread2Before(currentProcess);//update GUI
-          }
+
 
         }
 
         @Override
         protected void done() {//when finished
             super.done();
-            if(num==1){//if 1st thread
-                myDispatcher.Thread1After(currentProcess);//update GUI
-            }
-            else if(num==2){//if 2 thread
-                myDispatcher.Thread2After(currentProcess);//update GUI
-            }
+            myDispatcher.ThreadAfter(currentProcess);//update GUI
+
         }
 };
 
