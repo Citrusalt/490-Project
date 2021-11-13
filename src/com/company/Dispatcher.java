@@ -1,5 +1,7 @@
 package com.company;
 
+import java.util.ArrayList;
+
 /*
 * Class Dispatcher
 * makes Process Queue
@@ -15,30 +17,65 @@ public class Dispatcher {
     double sleepN;//time unit
     private Process Thread;//first thread
     int threadNum;
+    int timeSlice;
 
-    public Dispatcher(String filename, MainWindow z, double N, int tNum) {
+    public Dispatcher(String filename, MainWindow z, double N, int tNum, int tSlice) {
         System.out.println("Dispatcher Made");
         myProcessQueue = new ProcessQueue(filename);
         this.myMainWindow = z;
         sleepN = N;
         threadNum=tNum;
+        timeSlice=tSlice;
         if(threadNum==1) {
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable(myProcessQueue.Queue.get(i));
             }
+            Thread = new Process(this, HRRN(), sleepN, threadNum);//start execution
+            Thread.execute();
         }
         else if(threadNum==2){
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable2(myProcessQueue.Queue.get(i));
             }
+            Thread = new Process(this, PassProcess(), sleepN, threadNum);//start execution
+            Thread.execute();
 
         }
-        //start thread execution
-        Thread = new Process(this, PassProcess(), sleepN, 1);
-        RemoveLast();
-        Thread.execute();
 
     }
+
+     public Input HRRN() {
+         ArrayList<Input> possPross=new ArrayList<>();
+         for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
+             if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.time1){
+                 System.out.println("adding " + myProcessQueue.Queue.get(i).processID + " to possible process array");
+                 possPross.add(myProcessQueue.Queue.get(i));
+             }
+         }
+         if(possPross.size()==1){
+             System.out.println("1 possible process to execute");
+             return possPross.get(0);
+         }
+         else if(possPross.size()>1){
+             System.out.println(possPross.size() + " possible processes to execute");
+             float hrr = -9999;
+             float temp;
+             int loc=-1;
+             for (int i = 0; i < possPross.size(); i++){
+                 temp=((this.myMainWindow.time1-possPross.get(i).arrivalTime)+possPross.get(i).serviceTime)/possPross.get(i).serviceTime;
+                 if(hrr<temp){
+                     hrr=temp;
+                     loc=i;
+                 }
+             }
+
+             return possPross.get(loc);
+         }
+         else{
+             System.out.println("no possible process to execute");
+             return null;
+         }
+     }
 
 
     public Input PassProcess() {//pass current process
@@ -46,8 +83,8 @@ public class Dispatcher {
                 ;
     }
 
-    public void RemoveLast() {//remove current process
-        myProcessQueue.Queue.remove(0);
+    public void RemoveProcess(int i) {//remove current process
+        myProcessQueue.Queue.remove(i);
     }
 
     private void ThreadDone() {//when thread1 done, update throughtput and do next process if not empty
@@ -61,9 +98,14 @@ public class Dispatcher {
         }
         //this.myMainWindow.updateThroughput2();
         if (!myProcessQueue.Queue.isEmpty()) {
-            Thread = new Process(this, PassProcess(), sleepN, threadNum);
-            RemoveLast();
-            Thread.execute();
+            if(threadNum==1) {
+                Thread = new Process(this, HRRN(), sleepN, threadNum);
+                Thread.execute();
+            }
+            else if(threadNum==2) {
+                Thread = new Process(this, PassProcess(), sleepN, threadNum);
+                Thread.execute();
+            }
         } else {//else done with thread and update GUI
             if(threadNum==1) {
                 System.out.println("Thread1 Complete");
@@ -83,22 +125,28 @@ public class Dispatcher {
 
     public void ThreadBefore(Input currentProcess) {//update GUI before simulated process
 
-        System.out.println("Thread1 Before");
+        System.out.println("Thread Before");
+        for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
+            if(currentProcess.processID == myProcessQueue.Queue.get(i).processID){
+                RemoveProcess(i);
+                if(threadNum==1) {
+                    this.myMainWindow.setExecStatus1(currentProcess.processID);
+                    this.myMainWindow.setTimeLabel1(currentProcess.serviceTime, sleepN);
+                    this.myMainWindow.removeRowQueueTable(i);
+                }
+                else if(threadNum==2) {
+                    this.myMainWindow.setExecStatus2(currentProcess.processID);
+                    this.myMainWindow.setTimeLabel2(currentProcess.serviceTime, sleepN);
+                    this.myMainWindow.removeRowQueueTable2(i);
+                }
+            }
 
-        if(threadNum==1) {
-            this.myMainWindow.setExecStatus1(currentProcess.processID);
-            this.myMainWindow.setTimeLabel1(currentProcess.serviceTime, sleepN);
-            this.myMainWindow.removeRowQueueTable(0);
         }
-        else if(threadNum==2) {
-            this.myMainWindow.setExecStatus2(currentProcess.processID);
-            this.myMainWindow.setTimeLabel2(currentProcess.serviceTime, sleepN);
-            this.myMainWindow.removeRowQueueTable2(0);
-        }
+
     }
 
     public void ThreadAfter(Input currentProcess) {//update GUI after simulated process
-        System.out.println("Thread1 After");
+        System.out.println("Thread After");
         System.out.println(currentProcess.processID);
         if(threadNum==1) {
             this.myMainWindow.addRowProcessInfoTable(currentProcess); //table 1
@@ -108,4 +156,5 @@ public class Dispatcher {
         }
         ThreadDone();
     }
+
 }

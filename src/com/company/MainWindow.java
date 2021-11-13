@@ -40,12 +40,13 @@ public class MainWindow{
     private JTable processQueueTable2;
     private JTable processInfoTable2;
     private JLabel currentThroughputLabel2;
+    private JTextField timeSliceLabel;
     DefaultTableModel queueTable = new DefaultTableModel();
     DefaultTableModel infoTable = new DefaultTableModel();
     DefaultTableModel queueTable2 = new DefaultTableModel();
     DefaultTableModel infoTable2 = new DefaultTableModel();
-    private int time1=0;
-    private int time2=0;
+    public int time1=0;
+    public int time2=0;
     public double sleepN=0;
     public int completedProcesses = 0;
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
@@ -112,8 +113,8 @@ public class MainWindow{
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
                 sleepN = (double)timeMultiplier/1000;
-                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1 );
-                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2 );
+                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
+                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
 
                 sysStatus.setText("System Running");
 
@@ -206,7 +207,7 @@ public class MainWindow{
         row.add(String.valueOf(myInput.serviceTime));
         row.add(String.valueOf(time1 = time1 + myInput.serviceTime));
         row.add(String.valueOf(time1- myInput.arrivalTime));
-        row.add(String.valueOf((time1- myInput.arrivalTime)/ myInput.serviceTime));
+        row.add(String.valueOf((float)(time1- myInput.arrivalTime)/ myInput.serviceTime));
         infoTable.addRow(row);
     }
     public void addRowProcessInfoTable2(Input myInput){
@@ -216,7 +217,7 @@ public class MainWindow{
         row.add(String.valueOf(myInput.serviceTime));
         row.add(String.valueOf(time2 = time2 + myInput.serviceTime));
         row.add(String.valueOf(time2- myInput.arrivalTime));
-        row.add(String.valueOf((time2- myInput.arrivalTime)/ myInput.serviceTime));
+        row.add(String.valueOf((float)(time2- myInput.arrivalTime)/ myInput.serviceTime));
         infoTable2.addRow(row);
     }
     //updates throughput
