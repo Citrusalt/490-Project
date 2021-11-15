@@ -30,18 +30,50 @@ public class Dispatcher {
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable(myProcessQueue.Queue.get(i));
             }
-            Thread = new Process(this, HRRN(), sleepN, threadNum);//start execution
+            Thread = new Process(this, HRRN(), sleepN, threadNum, timeSlice);//start execution
             Thread.execute();
         }
         else if(threadNum==2){
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable2(myProcessQueue.Queue.get(i));
             }
-            Thread = new Process(this, PassProcess(), sleepN, threadNum);//start execution
+            Thread = new Process(this, PassProcess(), sleepN, threadNum, timeSlice);//start execution
             Thread.execute();
 
         }
 
+    }
+
+    public Input RR() {
+        ArrayList<Input> possPross=new ArrayList<>();
+        for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
+            if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.time2){
+                System.out.println("adding " + myProcessQueue.Queue.get(i).processID + " to possible process array");
+                possPross.add(myProcessQueue.Queue.get(i));
+            }
+        }
+        if(possPross.size()==1){
+            System.out.println("1 possible process to execute");
+            return possPross.get(0);
+        }
+        else if(possPross.size()>1){
+            System.out.println(possPross.size() + " possible processes to execute");
+            float hrr = -9999;
+            float temp;
+            int loc=-1;
+            for (int i = 0; i < possPross.size(); i++){
+                temp=((this.myMainWindow.time1-possPross.get(i).arrivalTime)+possPross.get(i).serviceTime)/possPross.get(i).serviceTime;
+                if(hrr<temp){
+                    hrr=temp;
+                    loc=i;
+                }
+            }
+            return possPross.get(loc);
+        }
+        else{
+            System.out.println("no possible process to execute");
+            return null;
+        }
     }
 
      public Input HRRN() {
@@ -99,11 +131,11 @@ public class Dispatcher {
         //this.myMainWindow.updateThroughput2();
         if (!myProcessQueue.Queue.isEmpty()) {
             if(threadNum==1) {
-                Thread = new Process(this, HRRN(), sleepN, threadNum);
+                Thread = new Process(this, HRRN(), sleepN, threadNum, timeSlice);
                 Thread.execute();
             }
             else if(threadNum==2) {
-                Thread = new Process(this, PassProcess(), sleepN, threadNum);
+                Thread = new Process(this, PassProcess(), sleepN, threadNum, timeSlice);
                 Thread.execute();
             }
         } else {//else done with thread and update GUI
