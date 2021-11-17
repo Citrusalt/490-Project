@@ -2,6 +2,7 @@ package com.company;
 
 import java.util.ArrayList;
 
+
 /*
 * Class Dispatcher
 * makes Process Queue
@@ -13,7 +14,7 @@ public class Dispatcher {
 
     MainWindow myMainWindow;// MainWindow instance
     protected ProcessQueue myProcessQueue;//singleton process queue
-
+    protected ArrayList<Input> queueCopy;
     double sleepN;//time unit
     private Process Thread;//first thread
     int threadNum;
@@ -22,6 +23,7 @@ public class Dispatcher {
     public Dispatcher(String filename, MainWindow z, double N, int tNum, int tSlice) {
         System.out.println("Dispatcher Made");
         myProcessQueue = new ProcessQueue(filename);
+        queueCopy=(ArrayList<Input>) PipedDeepCopy.copy(myProcessQueue.Queue);
         this.myMainWindow = z;
         sleepN = N;
         threadNum=tNum;
@@ -30,14 +32,14 @@ public class Dispatcher {
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable(myProcessQueue.Queue.get(i));
             }
-            Thread = new Process(this, HRRN(), sleepN, threadNum);//start execution
+            Thread = new Process(this, HRRN(), sleepN, threadNum, timeSlice);//start execution
             Thread.execute();
         }
         else if(threadNum==2){
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable2(myProcessQueue.Queue.get(i));
             }
-            Thread = new Process(this, PassProcess(), sleepN, threadNum);//start execution
+            Thread = new Process(this, PassProcess(), sleepN, threadNum, timeSlice);//start execution
             Thread.execute();
 
         }
@@ -99,11 +101,11 @@ public class Dispatcher {
         //this.myMainWindow.updateThroughput2();
         if (!myProcessQueue.Queue.isEmpty()) {
             if(threadNum==1) {
-                Thread = new Process(this, HRRN(), sleepN, threadNum);
+                Thread = new Process(this, HRRN(), sleepN, threadNum, timeSlice);
                 Thread.execute();
             }
             else if(threadNum==2) {
-                Thread = new Process(this, PassProcess(), sleepN, threadNum);
+                Thread = new Process(this, PassProcess(), sleepN, threadNum, timeSlice);
                 Thread.execute();
             }
         } else {//else done with thread and update GUI
@@ -152,7 +154,22 @@ public class Dispatcher {
             this.myMainWindow.addRowProcessInfoTable(currentProcess); //table 1
         }
         else if(threadNum==2) {
-            this.myMainWindow.addRowProcessInfoTable2(currentProcess); //table 2
+            currentProcess.serviceTime= currentProcess.serviceTime-timeSlice;
+            if(currentProcess.serviceTime<=0) {
+                System.out.println("Service time for current process <=0");
+                for(int i=0;i<queueCopy.size();i++){
+                    System.out.println(queueCopy.get(i).serviceTime);
+                    if(currentProcess.processID.equals(queueCopy.get(i).processID)){
+                        System.out.println("adding " + queueCopy.get(i).processID + " to process info table 2");
+                        this.myMainWindow.addRowProcessInfoTable2(queueCopy.get(i)); //table 2
+                    }
+                }
+
+            }
+            else if(currentProcess.serviceTime>0){
+                this.myMainWindow.addRowQueueTable2(currentProcess);
+                myProcessQueue.Queue.add(currentProcess);
+            }
         }
         ThreadDone();
     }

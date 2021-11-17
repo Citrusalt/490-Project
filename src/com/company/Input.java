@@ -6,7 +6,9 @@ package com.company;
 * one Input object represents one process
 */
 
-public class Input {
+import java.io.Serializable;
+
+public class Input implements Serializable {
         int arrivalTime;
         String processID;
         int serviceTime;
