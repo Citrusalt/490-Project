@@ -46,6 +46,38 @@ public class Dispatcher {
 
     }
 
+    public Input RR() {
+        ArrayList<Input> possPross=new ArrayList<>();
+        for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
+            if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.time2){
+                System.out.println("adding " + myProcessQueue.Queue.get(i).processID + " to possible process array");
+                possPross.add(myProcessQueue.Queue.get(i));
+            }
+        }
+        if(possPross.size()==1){
+            System.out.println("1 possible process to execute");
+            return possPross.get(0);
+        }
+        else if(possPross.size()>1){
+            System.out.println(possPross.size() + " possible processes to execute");
+            float hrr = -9999;
+            float temp;
+            int loc=-1;
+            for (int i = 0; i < possPross.size(); i++){
+                temp=((this.myMainWindow.time1-possPross.get(i).arrivalTime)+possPross.get(i).serviceTime)/possPross.get(i).serviceTime;
+                if(hrr<temp){
+                    hrr=temp;
+                    loc=i;
+                }
+            }
+            return possPross.get(loc);
+        }
+        else{
+            System.out.println("no possible process to execute");
+            return null;
+        }
+    }
+
      public Input HRRN() {
          ArrayList<Input> possPross=new ArrayList<>();
          for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
