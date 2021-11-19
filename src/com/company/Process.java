@@ -1,11 +1,8 @@
 package com.company;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.TimerTask;
-import java.util.Timer;
+
 /*
 * Process Class
 * Thread using swing workers
@@ -22,39 +19,53 @@ public class Process extends SwingWorker<Boolean, Input> {
         private int num;//1st or 2nd thread
         private int tSlice;//RR timeslice
         private static Object monitor = new Object();
-
+        private static Object sleeper = new Object();
         public Process(Dispatcher D, Input I, double N, int threadNum, int timeSlice) {
             myDispatcher=D;
             currentProcess=I;
             sleepN=N;
             num=threadNum;
             tSlice=timeSlice;
+
         }
 
         @Override
         protected Boolean doInBackground() throws Exception {
-            System.out.println("Thread " + num + " Started");
-            publish(currentProcess);//update GUI elements
-            //simulate execution of process
-            Timer timer=new Timer();
-            if(num==1) {
-
+            synchronized (monitor) {
                 try {
-                    Thread.sleep((long) (currentProcess.serviceTime * sleepN * 1000));  // sleepN needs to be converted to milliseconds
-                } catch (InterruptedException ex) {
-                    // TBD catch and deal with exception6 er
-                }
-            }
-            else if(num==2){
+                    while (myDispatcher.myMainWindow.pauseVar != 0) {
+                        monitor.wait();
+                    }
+                } catch (InterruptedException e) {
 
-                try {
-                    Thread.sleep((long) (tSlice * sleepN * 1000));  // sleepN needs to be converted to milliseconds
-                } catch (InterruptedException ex) {
-                    // TBD catch and deal with exception6 er
                 }
-            }
+                System.out.println("Thread " + num + " Started");
+                publish(currentProcess);//update GUI elements
+                //simulate execution of process
 
-            return true;
+
+                if(num==1) {
+
+                    synchronized (sleeper) {
+                        try {
+                            sleeper.wait((long) (currentProcess.serviceTime * sleepN * 1000));  // sleepN needs to be converted to milliseconds
+                        } catch (InterruptedException ex) {
+                            // TBD catch and deal with exception6 er
+                        }
+                    }
+                }
+                else if(num==2){
+                    synchronized (sleeper) {
+                        try {
+                            sleeper.wait((long) (tSlice * sleepN * 1000));  // sleepN needs to be converted to milliseconds
+                        } catch (InterruptedException ex) {
+                            // TBD catch and deal with exception6 er
+                        }
+                    }
+                }
+
+                return true;
+            }
         }
 
         @Override
@@ -73,5 +84,13 @@ public class Process extends SwingWorker<Boolean, Input> {
             myDispatcher.ThreadAfter(currentProcess);//update GUI
 
         }
+
+
+        protected void unpause(){
+            synchronized (monitor) {
+                monitor.notifyAll();
+            }
+        }
+
 };
 

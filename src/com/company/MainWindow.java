@@ -52,6 +52,10 @@ public class MainWindow{
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
     Timer timer1=new Timer();
     Timer timer2=new Timer();
+    public int pauseVar=0;
+    Dispatcher D1;
+    Dispatcher D2;
+
 
     public MainWindow() {
         System.out.println("MainWindow Constructor");
@@ -91,18 +95,28 @@ public class MainWindow{
             public void actionPerformed(ActionEvent e) {
                 sysStatus.setText("System Paused");
 
-                execStatus1.setText("exec: idle");
+                execStatus1.setText("exec: Paused");
+                execStatus2.setText("exec: Paused");
 
                 //call system pause function
-                try {
+
                     //sleep the thread as a "pause" for a long period of time
-                    Thread.sleep(20000);
+                    if(pauseVar==0) {
+                        pauseVar=1;
+
+//                        timer1.
+                    }
+                    else if(pauseVar==1){
+                        pauseVar=0;
+                        D1.Thread.unpause();
+                        D2.Thread.unpause();
+
+                    }
                     //tried to interrupt as a form of resume, but it didn't act right
                     //this also only pauses GUI for some reason and not processes
-                } catch (InterruptedException ex) {
                     return;
                 }
-            }
+
         });
 
         //File Entry Functionality; creates tables using CSVReader as parser
@@ -113,8 +127,8 @@ public class MainWindow{
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
                 sleepN = (double)timeMultiplier/1000;
-                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
-                new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
+                D1=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
+                D2=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
 
                 sysStatus.setText("System Running");
 

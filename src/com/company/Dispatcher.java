@@ -16,7 +16,7 @@ public class Dispatcher {
     protected ProcessQueue myProcessQueue;//singleton process queue
     protected ArrayList<Input> queueCopy;
     double sleepN;//time unit
-    private Process Thread;//first thread
+    protected Process Thread;//first thread
     int threadNum;
     int timeSlice;
 
