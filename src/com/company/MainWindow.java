@@ -255,11 +255,11 @@ public class MainWindow{
     public void addRowProcessInfoTable2(Input myInput){
         Vector<String> row =new Vector<String>();
         row.add(myInput.processID);
-        row.add(String.valueOf(myInput.arrivalTime));
-        row.add(String.valueOf(myInput.serviceTime));
-        row.add(String.valueOf(time2 = time2 + myInput.serviceTime));
-        row.add(String.valueOf(time2- myInput.arrivalTime));
-        row.add(String.valueOf((float)(time2- myInput.arrivalTime)/ myInput.serviceTime));
+        row.add(String.valueOf(myInput.arrivalTime));//arrival time
+        row.add(String.valueOf(myInput.serviceTime));//service time
+        row.add(String.valueOf(time2 = time2 + myInput.serviceTime));//finish time
+        row.add(String.valueOf(time2- myInput.arrivalTime));//TAT
+        row.add(String.valueOf((float)(time2- myInput.arrivalTime)/ myInput.serviceTime));//nTAT
         infoTable2.addRow(row);
     }
     //updates throughput
