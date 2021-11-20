@@ -18,8 +18,9 @@ public class Process extends SwingWorker<Boolean, Input> {
         private Dispatcher myDispatcher;//the dispatcher
         private int num;//1st or 2nd thread
         private int tSlice;//RR timeslice
-        private static Object monitor = new Object();
-        private static Object sleeper = new Object();
+        private static Object monitor1 = new Object();
+        private static Object monitor2 = new Object();
+        private static Object monitor3 = new Object();
         public Process(Dispatcher D, Input I, double N, int threadNum, int timeSlice) {
             myDispatcher=D;
             currentProcess=I;
@@ -31,41 +32,61 @@ public class Process extends SwingWorker<Boolean, Input> {
 
         @Override
         protected Boolean doInBackground() throws Exception {
-            synchronized (monitor) {
+            synchronized (monitor1) {
                 try {
                     while (myDispatcher.myMainWindow.pauseVar != 0) {
-                        monitor.wait();
+                        monitor1.wait();
                     }
                 } catch (InterruptedException e) {
 
                 }
-                System.out.println("Thread " + num + " Started");
-                publish(currentProcess);//update GUI elements
-                //simulate execution of process
-
-
-                if(num==1) {
-
-                    synchronized (sleeper) {
-                        try {
-                            sleeper.wait((long) (currentProcess.serviceTime * sleepN * 1000));  // sleepN needs to be converted to milliseconds
-                        } catch (InterruptedException ex) {
-                            // TBD catch and deal with exception6 er
-                        }
-                    }
-                }
-                else if(num==2){
-                    synchronized (sleeper) {
-                        try {
-                            sleeper.wait((long) (tSlice * sleepN * 1000));  // sleepN needs to be converted to milliseconds
-                        } catch (InterruptedException ex) {
-                            // TBD catch and deal with exception6 er
-                        }
-                    }
-                }
-
-                return true;
             }
+            System.out.println("Thread " + num + " Started");
+            publish(currentProcess);//update GUI elements
+            //simulate execution of process
+
+
+            if(num==1) {
+                for(int i=0;i<10;i++) {
+                    try {
+                        Thread.sleep((long) (currentProcess.serviceTime * sleepN * 1000)/10);  // sleepN needs to be converted to milliseconds, then divide by 10 for amount of iterations
+                            synchronized(monitor3) {
+                                while (myDispatcher.myMainWindow.pauseVar != 0)
+                                    monitor3.wait();
+                            }
+
+                    } catch (InterruptedException ex) {
+
+                    }
+                }
+
+            }
+            else if(num==2){
+                for(int i=0;i<10;i++) {
+                    try {
+                        Thread.sleep((long) (tSlice * sleepN * 1000)/10);  // sleepN needs to be converted to milliseconds, then divide by 10 for amount of iterations
+                            synchronized(monitor3) {
+                                while (myDispatcher.myMainWindow.pauseVar != 0)
+                                    monitor3.wait();
+                        }
+
+                    } catch (InterruptedException ex) {
+
+                    }
+                }
+
+            }
+
+            synchronized (monitor2) {
+                try {
+                    while (myDispatcher.myMainWindow.pauseVar != 0) {
+                        monitor2.wait();
+                    }
+                } catch (InterruptedException e) {
+
+                }
+            }
+            return true;
         }
 
         @Override
@@ -87,10 +108,18 @@ public class Process extends SwingWorker<Boolean, Input> {
 
 
         protected void unpause(){
-            synchronized (monitor) {
-                monitor.notifyAll();
+            synchronized (monitor1) {
+                monitor1.notifyAll();
             }
+            synchronized (monitor2) {
+                monitor2.notifyAll();
+            }
+            synchronized (monitor3) {
+                monitor3.notifyAll();
+            }
+
         }
+
 
 };
 
