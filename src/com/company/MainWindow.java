@@ -46,9 +46,11 @@ public class MainWindow{
     DefaultTableModel queueTable2 = new DefaultTableModel();
     DefaultTableModel infoTable2 = new DefaultTableModel();
     public int time1=0;
-    public int time2=0;
     public double sleepN=0;
-    public int completedProcesses = 0;
+    public int completedProcesses1 = 0;
+    public int completedProcesses2 = 0;
+    long rrTime = 0;
+    long rrStart = 0;
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
     Timer timer1;
     Timer timer2;
@@ -73,13 +75,14 @@ public class MainWindow{
         startSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 String timeField;
                 timeField = timeUnitTextField.getText();
                 int timeMultiplier = Integer.parseInt(timeField);
                 sleepN = (double)timeMultiplier/1000;
-
-
+                D1=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
+                D2=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
+                rrStart = System.currentTimeMillis();
+                rrTime = System.currentTimeMillis() - rrStart;
                 sysStatus.setText("System Running");
 
                 //Iterate through the Dispatcher's Process Queue to add rows to table
@@ -89,6 +92,8 @@ public class MainWindow{
                 timeLabel1.setText("time remaining: 0");
                 setExecStatus2("Finished");
                 timeLabel2.setText("time remaining: 0");
+
+
             }
         });
 
@@ -151,22 +156,6 @@ public class MainWindow{
         CSVEntryField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String timeField;
-                timeField = timeUnitTextField.getText();
-                int timeMultiplier = Integer.parseInt(timeField);
-                sleepN = (double)timeMultiplier/1000;
-                D1=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
-                D2=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
-
-                sysStatus.setText("System Running");
-
-                //Iterate through the Dispatcher's Process Queue to add rows to table
-
-                //Call some system run function
-                setExecStatus1("Finished");
-                timeLabel1.setText("time remaining: 0");
-                setExecStatus2("Finished");
-                timeLabel2.setText("time remaining: 0");
 
 
             }
@@ -253,27 +242,27 @@ public class MainWindow{
         infoTable.addRow(row);
     }
     public void addRowProcessInfoTable2(Input myInput){
+        completedProcesses2++;
         Vector<String> row =new Vector<String>();
         row.add(myInput.processID);
         row.add(String.valueOf(myInput.arrivalTime));//arrival time
         row.add(String.valueOf(myInput.serviceTime));//service time
-        row.add(String.valueOf(time2 = time2 + myInput.serviceTime));//finish time
-        row.add(String.valueOf(time2- myInput.arrivalTime));//TAT
-        row.add(String.valueOf((float)(time2- myInput.arrivalTime)/ myInput.serviceTime));//nTAT
+        row.add(String.valueOf(rrTime));//finish time
+        row.add(String.valueOf(rrTime- myInput.arrivalTime));//TAT
+        row.add(String.valueOf((float)(rrTime- myInput.arrivalTime)/ myInput.serviceTime));//nTAT
         infoTable2.addRow(row);
     }
     //updates throughput
     public void updateThroughput(){
 
-        completedProcesses++;
-        double throughput = (double)completedProcesses/(time1 * sleepN); //calculate throughput
+        completedProcesses1++;
+        double throughput = (double)completedProcesses1/(time1 * sleepN); //calculate throughput
         currentThroughputLabel.setText("Current Throughput: " + throughput);
     }
     //updates throughput
     public void updateThroughput2(){
 
-        completedProcesses++;
-        double throughput = (double)completedProcesses/(time2 * sleepN); //calculate throughput
+        double throughput = (double)completedProcesses2/(rrTime * sleepN); //calculate throughput
         currentThroughputLabel2.setText("Current Throughput: " + throughput);
     }
     //updates timelabel1

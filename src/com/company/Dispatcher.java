@@ -39,19 +39,34 @@ public class Dispatcher {
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable2(myProcessQueue.Queue.get(i));
             }
-            Thread = new Process(this, PassProcess(), sleepN, threadNum, timeSlice);//start execution
+            Thread = new Process(this, RR(), sleepN, threadNum, timeSlice);//start execution
             Thread.execute();
 
         }
 
     }
 
+    public Input RR(){
+        ArrayList<Input> possPross=new ArrayList<>();
+        for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
+            if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.rrTime){
+                System.out.println("adding " + myProcessQueue.Queue.get(i).processID + " to RR possible process array");
+                possPross.add(myProcessQueue.Queue.get(i));
+            }
+        }
+        if(!possPross.isEmpty()) {
+            return possPross.get(0);
+        }
+        else{
+            return null;
+        }
+    }
 
      public Input HRRN() {
          ArrayList<Input> possPross=new ArrayList<>();
          for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
              if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.time1){
-                 System.out.println("adding " + myProcessQueue.Queue.get(i).processID + " to possible process array");
+                 System.out.println("adding " + myProcessQueue.Queue.get(i).processID + " to HRRN possible process array");
                  possPross.add(myProcessQueue.Queue.get(i));
              }
          }
@@ -82,8 +97,7 @@ public class Dispatcher {
 
 
     public Input PassProcess() {//pass current process
-        return myProcessQueue.Queue.get(0)
-                ;
+        return myProcessQueue.Queue.get(0);
     }
 
     public void RemoveProcess(int i) {//remove current process
@@ -108,7 +122,7 @@ public class Dispatcher {
                 Thread.execute();
             }
             else if(threadNum==2) {
-                Thread = new Process(this, PassProcess(), sleepN, threadNum, timeSlice);
+                Thread = new Process(this, RR(), sleepN, threadNum, timeSlice);
                 Thread.execute();
             }
         } else {//else done with thread and update GUI
