@@ -93,10 +93,12 @@ public class Dispatcher {
     private void ThreadDone() {//when thread1 done, update throughtput and do next process if not empty
         if(threadNum==1) {
             System.out.println("Thread1 Done");
+            this.myMainWindow.timer1.cancel();
             this.myMainWindow.updateThroughput();
         }
         else if(threadNum==2) {
             System.out.println("Thread2 Done");
+            this.myMainWindow.timer2.cancel();
             this.myMainWindow.updateThroughput2();
         }
         //this.myMainWindow.updateThroughput2();
@@ -113,13 +115,11 @@ public class Dispatcher {
             if(threadNum==1) {
                 System.out.println("Thread1 Complete");
                 this.myMainWindow.setExecStatus1("Finished");
-                this.myMainWindow.timer1.cancel();
                 this.myMainWindow.timeLabel1.setText("time remaining: NaN");
             }
             else if(threadNum==2){
                 System.out.println("Thread2 Complete");
                 this.myMainWindow.setExecStatus2("Finished");
-                this.myMainWindow.timer2.cancel();
                 this.myMainWindow.timeLabel2.setText("time remaining: NaN");
             }
         }

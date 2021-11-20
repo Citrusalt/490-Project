@@ -50,11 +50,14 @@ public class MainWindow{
     public double sleepN=0;
     public int completedProcesses = 0;
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
-    Timer timer1=new Timer();
-    Timer timer2=new Timer();
+    Timer timer1;
+    Timer timer2;
     public int pauseVar=0;
     Dispatcher D1;
     Dispatcher D2;
+    private double t1;
+    private double t2;
+
 
 
     public MainWindow() {
@@ -93,23 +96,48 @@ public class MainWindow{
         pauseSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sysStatus.setText("System Paused");
-
-                execStatus1.setText("exec: Paused");
-                execStatus2.setText("exec: Paused");
+                sysStatus.setText("System Running");
 
                 //call system pause function
 
                     //sleep the thread as a "pause" for a long period of time
                     if(pauseVar==0) {
                         pauseVar=1;
-
-//                        timer1.
+                        sysStatus.setText("System Paused");
+                        pauseSystemButton.setText("Run");
+                        timer1.cancel();
+                        timer2.cancel();
                     }
                     else if(pauseVar==1){
                         pauseVar=0;
+                        sysStatus.setText("System Running");
+                        pauseSystemButton.setText("Pause");
                         D1.Thread.unpause();
                         D2.Thread.unpause();
+                        timer1= new Timer();
+                        timer2= new Timer();
+                        timer1.scheduleAtFixedRate(new TimerTask() {
+
+                            @Override
+                            public void run() {
+                                if (t1 >= 0) {
+                                    timeLabel1.setText("time remaining:" + decimalFormat.format(t1--));
+                                } else {
+                                    timeLabel1.setText("time remaining: 0");
+                                }
+                            }
+                        }, 0, 1000);
+                        timer2.scheduleAtFixedRate(new TimerTask() {
+
+                            @Override
+                            public void run() {
+                                if (t2 >= 0) {
+                                    timeLabel2.setText("time remaining:" + decimalFormat.format(t2--));
+                                } else {
+                                    timeLabel2.setText("time remaining: 0");
+                                }
+                            }
+                        }, 0, 1000);
 
                     }
                     //tried to interrupt as a form of resume, but it didn't act right
@@ -250,25 +278,34 @@ public class MainWindow{
     }
     //updates timelabel1
     public void setTimeLabel1(int servicetime, double sleepN){
-
+        t1=servicetime*sleepN;
+        timer1=new Timer();
         timer1.scheduleAtFixedRate(new TimerTask() {
-            double z=servicetime*sleepN;
+
             @Override
             public void run() {
-                timeLabel1.setText("time remaining:" + decimalFormat.format(z--));
+                if (t1 >= 0) {
+                    timeLabel1.setText("time remaining:" + decimalFormat.format(t1--));
+                } else {
+                    timeLabel1.setText("time remaining: 0");
+                }
             }
         }, 0, 1000);
 
     }
     //updates timelabel2
     public void setTimeLabel2(int servicetime, double sleepN){
-
+        t2=servicetime*sleepN;
+        timer2=new Timer();
         timer2.scheduleAtFixedRate(new TimerTask() {
-            double z=servicetime*sleepN;
+
             @Override
             public void run() {
-                timeLabel2.setText("time remaining:" + decimalFormat.format(z--));
-
+                if (t2 >= 0) {
+                    timeLabel2.setText("time remaining:" + decimalFormat.format(t2--));
+                } else {
+                    timeLabel2.setText("time remaining: 0");
+                }
             }
         }, 0, 1000);
 

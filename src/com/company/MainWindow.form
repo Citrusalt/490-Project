@@ -25,7 +25,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Pause System"/>
+          <text value="Pause/Run"/>
         </properties>
       </component>
       <component id="8526f" class="javax.swing.JLabel" binding="sysStatus">
