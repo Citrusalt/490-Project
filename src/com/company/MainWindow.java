@@ -49,9 +49,12 @@ public class MainWindow{
     public int time2=0;
     public double sleepN=0;
     public int completedProcesses = 0;
+    public int completedProcesses2 = 0;
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
     Timer timer1=new Timer();
     Timer timer2=new Timer();
+    long rrTime = 0;
+    long rrStart = 0;
     public int pauseVar=0;
     Dispatcher D1;
     Dispatcher D2;
@@ -81,7 +84,9 @@ public class MainWindow{
 
                 //Iterate through the Dispatcher's Process Queue to add rows to table
 
+
                 //Call some system run function
+                // Use same logic as the enter of the test.csv box
                 setExecStatus1("Finished");
                 timeLabel1.setText("time remaining: 0");
                 setExecStatus2("Finished");
@@ -133,6 +138,9 @@ public class MainWindow{
                 sysStatus.setText("System Running");
 
                 //Iterate through the Dispatcher's Process Queue to add rows to table
+
+                rrStart = System.currentTimeMillis();
+                rrTime = System.currentTimeMillis() - rrStart;
 
                 //Call some system run function
                 setExecStatus1("Finished");
@@ -225,13 +233,16 @@ public class MainWindow{
         infoTable.addRow(row);
     }
     public void addRowProcessInfoTable2(Input myInput){
+
+        completedProcesses2++;
         Vector<String> row =new Vector<String>();
         row.add(myInput.processID);
         row.add(String.valueOf(myInput.arrivalTime));
         row.add(String.valueOf(myInput.serviceTime));
-        row.add(String.valueOf(time2 = time2 + myInput.serviceTime));
-        row.add(String.valueOf(time2- myInput.arrivalTime));
-        row.add(String.valueOf((float)(time2- myInput.arrivalTime)/ myInput.serviceTime));
+        // use global timer variable in place of anywhere where time2 exists
+        row.add(String.valueOf(rrTime = rrTime + myInput.serviceTime));
+        row.add(String.valueOf(rrTime- myInput.arrivalTime));
+        row.add(String.valueOf((float)(rrTime - myInput.arrivalTime)/ myInput.serviceTime));
         infoTable2.addRow(row);
     }
     //updates throughput
@@ -244,8 +255,7 @@ public class MainWindow{
     //updates throughput
     public void updateThroughput2(){
 
-        completedProcesses++;
-        double throughput = (double)completedProcesses/(time2 * sleepN); //calculate throughput
+        double throughput = (double)completedProcesses2/(rrTime * sleepN); //calculate throughput
         currentThroughputLabel2.setText("Current Throughput: " + throughput);
     }
     //updates timelabel1
