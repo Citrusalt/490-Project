@@ -59,6 +59,7 @@ public class MainWindow{
     private double t1;
     private double t2;
     public int rrT;
+    private boolean hasStarted = false;
 
 
     public MainWindow() {
@@ -74,32 +75,41 @@ public class MainWindow{
         startSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String timeField;
-                timeField = timeUnitTextField.getText();
-                int timeMultiplier = Integer.parseInt(timeField);
-                sleepN = (double)timeMultiplier/1000;
-                D1=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
-                D2=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
 
-                sysStatus.setText("System Running");
+                if (!hasStarted){
 
-                //Iterate through the Dispatcher's Process Queue to add rows to table
+                    hasStarted = true;
 
-                //Call some system run function
-                setExecStatus1("Finished");
-                timeLabel1.setText("time remaining: 0");
-                setExecStatus2("Finished");
-                timeLabel2.setText("time remaining: 0");
+                    String timeField;
+                    timeField = timeUnitTextField.getText();
+                    int timeMultiplier = Integer.parseInt(timeField);
+                    sleepN = (double)timeMultiplier/1000;
+                    D1=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
+                    D2=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
 
-                rrTimer = new Timer();
-                rrTimer.scheduleAtFixedRate(new TimerTask() {
+                    sysStatus.setText("System Running");
 
-                    @Override
-                    public void run() {
+                    //Iterate through the Dispatcher's Process Queue to add rows to table
 
-                        rrT = rrT + 1;
-                    }
-                }, 0, timeMultiplier);
+                    //Call some system run function
+                    setExecStatus1("Finished");
+                    timeLabel1.setText("time remaining: 0");
+                    setExecStatus2("Finished");
+                    timeLabel2.setText("time remaining: 0");
+
+                    rrTimer = new Timer();
+                    rrTimer.scheduleAtFixedRate(new TimerTask() {
+
+                        @Override
+                        public void run() {
+
+                            rrT = rrT + 1;
+                        }
+                    }, 0, timeMultiplier);
+
+                }
+
+
 
             }
         });
@@ -108,12 +118,14 @@ public class MainWindow{
         pauseSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sysStatus.setText("System Running");
-                String timeField;
-                timeField = timeUnitTextField.getText();
-                int timeMultiplier = Integer.parseInt(timeField);
 
-                //call system pause function
+                if (hasStarted){
+                    sysStatus.setText("System Running");
+                    String timeField;
+                    timeField = timeUnitTextField.getText();
+                    int timeMultiplier = Integer.parseInt(timeField);
+
+                    //call system pause function
 
                     //sleep the thread as a "pause" for a long period of time
                     if(pauseVar==0) {
@@ -171,6 +183,8 @@ public class MainWindow{
                     //tried to interrupt as a form of resume, but it didn't act right
                     //this also only pauses GUI for some reason and not processes
                     return;
+                }
+
                 }
 
         });
