@@ -49,7 +49,7 @@ public class Dispatcher {
     public Input RR(){
         ArrayList<Input> possPross=new ArrayList<>();
         for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
-            if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.rrTime){
+            if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.rrT){
                 System.out.println("adding " + myProcessQueue.Queue.get(i).processID + " to RR possible process array");
                 possPross.add(myProcessQueue.Queue.get(i));
             }

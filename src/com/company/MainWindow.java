@@ -49,17 +49,16 @@ public class MainWindow{
     public double sleepN=0;
     public int completedProcesses1 = 0;
     public int completedProcesses2 = 0;
-    long rrTime = 0;
-    long rrStart = 0;
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
     Timer timer1;
     Timer timer2;
+    Timer rrTimer;
     public int pauseVar=0;
     Dispatcher D1;
     Dispatcher D2;
     private double t1;
     private double t2;
-
+    public int rrT;
 
 
     public MainWindow() {
@@ -81,8 +80,7 @@ public class MainWindow{
                 sleepN = (double)timeMultiplier/1000;
                 D1=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
                 D2=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
-                rrStart = System.currentTimeMillis();
-                rrTime = System.currentTimeMillis() - rrStart;
+
                 sysStatus.setText("System Running");
 
                 //Iterate through the Dispatcher's Process Queue to add rows to table
@@ -93,6 +91,15 @@ public class MainWindow{
                 setExecStatus2("Finished");
                 timeLabel2.setText("time remaining: 0");
 
+                rrTimer = new Timer();
+                rrTimer.scheduleAtFixedRate(new TimerTask() {
+
+                    @Override
+                    public void run() {
+
+                        rrT = rrT + 1;
+                    }
+                }, 0, timeMultiplier);
 
             }
         });
@@ -102,6 +109,9 @@ public class MainWindow{
             @Override
             public void actionPerformed(ActionEvent e) {
                 sysStatus.setText("System Running");
+                String timeField;
+                timeField = timeUnitTextField.getText();
+                int timeMultiplier = Integer.parseInt(timeField);
 
                 //call system pause function
 
@@ -112,6 +122,7 @@ public class MainWindow{
                         pauseSystemButton.setText("Run");
                         timer1.cancel();
                         timer2.cancel();
+                        rrTimer.cancel();
                     }
                     else if(pauseVar==1){
                         pauseVar=0;
@@ -121,6 +132,8 @@ public class MainWindow{
                         D2.Thread.unpause();
                         timer1= new Timer();
                         timer2= new Timer();
+                        rrTimer= new Timer();
+
                         timer1.scheduleAtFixedRate(new TimerTask() {
 
                             @Override
@@ -143,6 +156,16 @@ public class MainWindow{
                                 }
                             }
                         }, 0, 1000);
+
+                        rrTimer.scheduleAtFixedRate(new TimerTask() {
+
+                            @Override
+                            public void run() {
+
+                                rrT = rrT + 1;
+                            }
+                        }, 0, timeMultiplier);
+
 
                     }
                     //tried to interrupt as a form of resume, but it didn't act right
@@ -247,9 +270,9 @@ public class MainWindow{
         row.add(myInput.processID);
         row.add(String.valueOf(myInput.arrivalTime));//arrival time
         row.add(String.valueOf(myInput.serviceTime));//service time
-        row.add(String.valueOf(rrTime));//finish time
-        row.add(String.valueOf(rrTime- myInput.arrivalTime));//TAT
-        row.add(String.valueOf((float)(rrTime- myInput.arrivalTime)/ myInput.serviceTime));//nTAT
+        row.add(String.valueOf(rrT));//finish time
+        row.add(String.valueOf(rrT- myInput.arrivalTime));//TAT
+        row.add(String.valueOf((float)(rrT- myInput.arrivalTime)/ myInput.serviceTime));//nTAT
         infoTable2.addRow(row);
     }
     //updates throughput
@@ -262,7 +285,7 @@ public class MainWindow{
     //updates throughput
     public void updateThroughput2(){
 
-        double throughput = (double)completedProcesses2/(rrTime * sleepN); //calculate throughput
+        double throughput = (double)completedProcesses2/(rrT * sleepN); //calculate throughput
         currentThroughputLabel2.setText("Current Throughput: " + throughput);
     }
     //updates timelabel1
