@@ -9,16 +9,17 @@ import java.util.ArrayList;
 * makes threads
 * provides update functions for the GUI via MainWindow instance
 * continue doing processes until no more
+* implement RR and HRRN algorithms
 */
 public class Dispatcher {
 
     MainWindow myMainWindow;// MainWindow instance
     protected ProcessQueue myProcessQueue;//singleton process queue
-    protected ArrayList<Input> queueCopy;
+    protected ArrayList<Input> queueCopy;//copy of queue
     double sleepN;//time unit
     protected Process Thread;//first thread
-    int threadNum;
-    int timeSlice;
+    int threadNum;//number of thread
+    int timeSlice;//timeslice
 
     public Dispatcher(String filename, MainWindow z, double N, int tNum, int tSlice) {
         System.out.println("Dispatcher Made");
@@ -28,14 +29,14 @@ public class Dispatcher {
         sleepN = N;
         threadNum=tNum;
         timeSlice=tSlice;
-        if(threadNum==1) {
+        if(threadNum==1) {//start thread 1 HRRN
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable(myProcessQueue.Queue.get(i));
             }
             Thread = new Process(this, HRRN(), sleepN, threadNum, timeSlice);//start execution
             Thread.execute();
         }
-        else if(threadNum==2){
+        else if(threadNum==2){//start thread 2 RR
             for (int i = 0; i < myProcessQueue.Queue.size(); i++) {//fill queue table
                 this.myMainWindow.addRowQueueTable2(myProcessQueue.Queue.get(i));
             }
@@ -46,7 +47,7 @@ public class Dispatcher {
 
     }
 
-    public Input RR(){
+    public Input RR(){//RR arrival time process check
         ArrayList<Input> possPross=new ArrayList<>();
         for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
             if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.rrT){
@@ -62,7 +63,7 @@ public class Dispatcher {
         }
     }
 
-     public Input HRRN() {
+     public Input HRRN() {//HRRN algorithm for choosing next process
          ArrayList<Input> possPross=new ArrayList<>();
          for (int i = 0; i < myProcessQueue.Queue.size(); i++) {
              if(myProcessQueue.Queue.get(i).arrivalTime <= this.myMainWindow.time1){
@@ -96,15 +97,15 @@ public class Dispatcher {
      }
 
 
-    public Input PassProcess() {//pass current process
+    public Input PassProcess() {//pass 0th process
         return myProcessQueue.Queue.get(0);
     }
 
-    public void RemoveProcess(int i) {//remove current process
+    public void RemoveProcess(int i) {//remove 0th process
         myProcessQueue.Queue.remove(i);
     }
 
-    private void ThreadDone() {//when thread1 done, update throughtput and do next process if not empty
+    private void ThreadDone() {//when thread done, update throughtput, cancel timer, and do next process if not empty
         if(threadNum==1) {
             System.out.println("Thread1 Done");
             this.myMainWindow.timer1.cancel();
@@ -115,8 +116,7 @@ public class Dispatcher {
             this.myMainWindow.timer2.cancel();
             this.myMainWindow.updateThroughput2();
         }
-        //this.myMainWindow.updateThroughput2();
-        if (!myProcessQueue.Queue.isEmpty()) {
+        if (!myProcessQueue.Queue.isEmpty()) {//if more processes to do, then do
             if(threadNum==1) {
                 Thread = new Process(this, HRRN(), sleepN, threadNum, timeSlice);
                 Thread.execute();
@@ -168,7 +168,7 @@ public class Dispatcher {
         if(threadNum==1) {
             this.myMainWindow.addRowProcessInfoTable(currentProcess); //table 1
         }
-        else if(threadNum==2) {
+        else if(threadNum==2) {//check if  any RR processes done
             currentProcess.serviceTime= currentProcess.serviceTime-timeSlice;
             if(currentProcess.serviceTime<=0) {
                 System.out.println("Service time for current process <=0");

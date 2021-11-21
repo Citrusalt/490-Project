@@ -75,15 +75,16 @@ public class MainWindow{
         startSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                //if have started, cant start again
                 if (!hasStarted){
 
                     hasStarted = true;
-
+                    //get and calculate time unit
                     String timeField;
                     timeField = timeUnitTextField.getText();
                     int timeMultiplier = Integer.parseInt(timeField);
                     sleepN = (double)timeMultiplier/1000;
+                    //start the 2 dispatchers
                     D1=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 1,-1 );
                     D2=new Dispatcher(CSVEntryField.getText(), MainWindow.this, sleepN, 2,Integer.parseInt(timeSliceLabel.getText()));
 
@@ -96,7 +97,7 @@ public class MainWindow{
                     timeLabel1.setText("time remaining: 0");
                     setExecStatus2("Finished");
                     timeLabel2.setText("time remaining: 0");
-
+                    //start global timer for 2nd CPU
                     rrTimer = new Timer();
                     rrTimer.scheduleAtFixedRate(new TimerTask() {
 
@@ -118,7 +119,7 @@ public class MainWindow{
         pauseSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                //cant pause before has started
                 if (hasStarted){
                     sysStatus.setText("System Running");
                     String timeField;
@@ -132,16 +133,20 @@ public class MainWindow{
                         pauseVar=1;
                         sysStatus.setText("System Paused");
                         pauseSystemButton.setText("Run");
+                        //kill timers
                         timer1.cancel();
                         timer2.cancel();
                         rrTimer.cancel();
                     }
+                    //is paused, unpause
                     else if(pauseVar==1){
                         pauseVar=0;
                         sysStatus.setText("System Running");
                         pauseSystemButton.setText("Pause");
+                        //unpause threads
                         D1.Thread.unpause();
                         D2.Thread.unpause();
+                        //make new timers and give them same task
                         timer1= new Timer();
                         timer2= new Timer();
                         rrTimer= new Timer();

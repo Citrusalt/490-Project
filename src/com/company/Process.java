@@ -18,6 +18,7 @@ public class Process extends SwingWorker<Boolean, Input> {
         private Dispatcher myDispatcher;//the dispatcher
         private int num;//1st or 2nd thread
         private int tSlice;//RR timeslice
+        //monitor objects
         private static Object monitor1 = new Object();
         private static Object monitor2 = new Object();
         private static Object monitor3 = new Object();
@@ -32,7 +33,7 @@ public class Process extends SwingWorker<Boolean, Input> {
 
         @Override
         protected Boolean doInBackground() throws Exception {
-            synchronized (monitor1) {
+            synchronized (monitor1) {//dont let new process start if paused
                 try {
                     while (myDispatcher.myMainWindow.pauseVar != 0) {
                         monitor1.wait();
@@ -50,7 +51,7 @@ public class Process extends SwingWorker<Boolean, Input> {
                 for(int i=0;i<10;i++) {
                     try {
                         Thread.sleep((long) (currentProcess.serviceTime * sleepN * 1000)/10);  // sleepN needs to be converted to milliseconds, then divide by 10 for amount of iterations
-                            synchronized(monitor3) {
+                            synchronized(monitor3) {//interrupt sleeping if pause
                                 while (myDispatcher.myMainWindow.pauseVar != 0)
                                     monitor3.wait();
                             }
@@ -77,7 +78,7 @@ public class Process extends SwingWorker<Boolean, Input> {
 
             }
 
-            synchronized (monitor2) {
+            synchronized (monitor2) {//dont let current process finish if paused
                 try {
                     while (myDispatcher.myMainWindow.pauseVar != 0) {
                         monitor2.wait();
@@ -107,7 +108,7 @@ public class Process extends SwingWorker<Boolean, Input> {
         }
 
 
-        protected void unpause(){
+        protected void unpause(){//unpause threads
             synchronized (monitor1) {
                 monitor1.notifyAll();
             }
