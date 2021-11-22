@@ -52,13 +52,13 @@ public class MainWindow{
     DecimalFormat decimalFormat=new DecimalFormat("#.000");
     Timer timer1;
     Timer timer2;
-    Timer rrTimer;
+    Timer rrTimer; //round robin timer
     public int pauseVar=0;
     Dispatcher D1;
     Dispatcher D2;
     private double t1;
     private double t2;
-    public int rrT;
+    public int rrT; //time unit for round robin
     private boolean hasStarted = false;
 
 
@@ -102,6 +102,7 @@ public class MainWindow{
                     rrTimer.scheduleAtFixedRate(new TimerTask() {
 
                         @Override
+                        //update time unit for round robin
                         public void run() {
 
                             rrT = rrT + 1;
